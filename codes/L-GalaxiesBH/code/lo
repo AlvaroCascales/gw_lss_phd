@@ -1,0 +1,90 @@
+Coincidencia en el archivo binario age.o
+allvars.h:  float e_v_sigma_now;               // for the spin computation
+allvars.h:  float v_sigma_now;                   // Assigned v/sigma according to bulge formation
+allvars.i:  float v_sigma_now;
+Coincidencia en el archivo binario allvars.o
+ç:           Gal[p].WBlHo[i].e_v_sigma_now = -1.;
+ç:        Gal[p].WBlHo[indx_wBH].e_v_sigma_now = -1.;
+ç:  Gal[gal_targ].WBlHo[wbh_targ].e_v_sigma_now = Gal[gal_obj].WBlHo[wbh_obj].e_v_sigma_now;
+Coincidencia en el archivo binario cool_func.o
+Coincidencia en el archivo binario init.o
+Coincidencia en el archivo binario io_tree.o
+Coincidencia en el archivo binario main.o
+Coincidencia en el archivo binario metals.o
+model_bulges.c: 	Gal[p].v_sigma_now = -1.;
+model_bulges.c: 	Gal[p].v_sigma_now = -1.0;
+model_bulges.c:    v_sigma_before = Gal[p].v_sigma_now ;
+model_bulges.c:	 if(Gal[p].v_sigma_now > 2.838364 && Gal[p].v_sigma_now < 2.838366)
+model_bulges.c:        {Gal[p].type_v_sigma = 1; Gal[p].v_sigma_now = altura_number(Gal[p].type_v_sigma,p,n_step);}
+model_bulges.c:        {Gal[p].type_v_sigma = 2; Gal[p].v_sigma_now = altura_number(Gal[p].type_v_sigma,p,n_step);}
+model_bulges.c:               Gal[p].v_sigma_now = altura_number(Gal[p].type_v_sigma,p,n_step);
+model_bulges.c:               Gal[p].v_sigma_now = ((Bulge_after - Bulge_before)*Gal[p].v_sigma_now + Gal[p].Bulge_di*v_sigma_before)/((Bulge_after - Bulge_before) + Gal[p].Bulge_di);
+model_bulges.c:               if(isnan(Gal[p].v_sigma_now) == 1) Gal[p].v_sigma_now = altura_number(Gal[p].type_v_sigma,p,n_step); // Usually happens when 1) Gal[p].Bulge_di = 0 and 2) the ammount of mass trasnfered during the DI is almost ~ 0 so: Bulge_after ~=Bulge_after
+model_bulges.c:                   Gal[p].v_sigma_now = ((Bulge_after - Bulge_before)*Gal[p].v_sigma_now + Gal[p].Bulge_di*v_sigma_before)/((Bulge_after - Bulge_before) + Gal[p].Bulge_di);
+model_bulges.c:                   if(isnan(Gal[p].v_sigma_now) == 1) Gal[p].v_sigma_now = altura_number(Gal[p].type_v_sigma,p,n_step); // Usually happens when 1) Gal[p].Bulge_di = 0 and 2) the ammount of mass trasnfered during the DI is almost ~ 0 so: Bulge_after ~=Bulge_after
+model_bulges.c:                   //Gal[p].v_sigma_now = altura_number(Gal[p].type_v_sigma);
+model_bulges.c:                           Gal[p].v_sigma_now = ((Bulge_after - Bulge_before)*Gal[p].v_sigma_now + Gal[p].Bulge_di*v_sigma_before)/((Bulge_after - Bulge_before) + Gal[p].Bulge_di);
+model_bulges.c:                           if(isnan(Gal[p].v_sigma_now) == 1) Gal[p].v_sigma_now = altura_number(Gal[p].type_v_sigma,p,n_step); // Usually happens when 1) Gal[p].Bulge_di = 0 and 2) the ammount of mass trasnfered during the DI is almost ~ 0 so: Bulge_after ~=Bulge_after
+model_bulges.c:                           //Gal[p].v_sigma_now = altura_number(Gal[p].type_v_sigma);
+model_bulges.c:                    else {Gal[p].v_sigma_now = Gal[p].v_sigma_now;  Gal[p].type_v_sigma = Gal[p].type_v_sigma; dummy = 3;}
+model_bulges.c: if(isnan(Gal[p].v_sigma_now) == 1 || Gal[p].v_sigma_now < 0) {printf("Error in check_if_DI_is_minor_merger_induced(). The value of Galaxy v_sigma_now is nan or negative! dummy = %d, Bulge_after = %E, Bulge_before = %E, Gal[p].Bulge_di = %E, ((Bulge_after - Bulge_before) + Gal[p].Bulge_di) = %E\n",dummy, Bulge_after, Bulge_before, Gal[p].Bulge_di,(Bulge_after - Bulge_before) + Gal[p].Bulge_di); exit(0);}
+Coincidencia en el archivo binario model_bulges.o
+Coincidencia en el archivo binario model_cooling.o
+Coincidencia en el archivo binario model_disrupt.o
+Coincidencia en el archivo binario model_dust.o
+Coincidencia en el archivo binario model_igm_metallicity.o
+Coincidencia en el archivo binario model_infall.o
+Coincidencia en el archivo binario model_lyman_werner.o
+model_mergers.c:    printf("v_sigma_now = %E\n",Gal[p].v_sigma_now);}
+Coincidencia en el archivo binario model_mergers.o
+Coincidencia en el archivo binario model_misc.o
+model_nuclear_black_hole.c:                                        //self_gravity_accretion_Sesana(MBH_i,M_dot,fEdd,&a,&eta,epsilon,Gal[gal_num].v_sigma_now,dt);
+model_nuclear_black_hole.c:                                        Self_Gravity_Accretion_Sesana_Model(gal_num,MBH_i,M_dot,fEdd,&a,&eta,epsilon,Gal[gal_num].v_sigma_now,dt,filenr);
+model_nuclear_black_hole.c:                          if(spinComputation == 1 && fEdd>0) { Self_Gravity_Accretion_Sesana_Model(gal_num,MBH_i,M_dot,fEdd,&a,&eta,epsilon,Gal[gal_num].v_sigma_now,dt/(1.0*times_substep),filenr); }
+model_nuclear_black_hole.c:         if(fEdd > 0.) Self_Gravity_Accretion_Sesana_Model(p,MBH_i,M_dot,fEdd,&a,&eta,epsilon,Gal[p].v_sigma_now,dt,filenr);
+model_nuclear_black_hole.c:          if(fEdd > 0.) Self_Gravity_Accretion_Sesana_Model(p,MBH_i,M_dot,fEdd,&a,&eta,epsilon,Gal[p].v_sigma_now,dt/(1.0*times_substep),filenr);
+model_nuclear_black_hole.c:  //printf("Gal[t].v_sigma_now = %f, Gal[p].v_sigma_now = %f, Smoothacretion = %d \n", Gal[t].v_sigma_now,Gal[p].v_sigma_now,Smooth_accretion);
+model_nuclear_black_hole.c:           Gal[p].v_sigma_now = -1;
+model_nuclear_black_hole.c:           Gal[t].v_sigma_now = altura_number(Gal[t].type_v_sigma,t,n_step);
+model_nuclear_black_hole.c:           if(isnan(Gal[t].v_sigma_now) == 1) {printf("Error in add_galaxies_together(). The value of central v_sigma_now is nan!\n"); exit(0);}
+model_nuclear_black_hole.c:           if(Gal[t].v_sigma_now < 0 && Gal[p].v_sigma_now < 0)
+model_nuclear_black_hole.c:                  if(Smooth_accretion>0){Gal[t].type_v_sigma = 1; Gal[t].v_sigma_now = altura_number(2,t,n_step);}
+model_nuclear_black_hole.c:                  else{Gal[t].type_v_sigma = 1; Gal[t].v_sigma_now = altura_number(Gal[t].type_v_sigma,t,n_step);}
+model_nuclear_black_hole.c:           else if(Gal[t].v_sigma_now > 0 && Gal[p].v_sigma_now < 0)
+model_nuclear_black_hole.c:                   if(Smooth_accretion>0){Gal[t].type_v_sigma = 1; Gal[t].v_sigma_now =  Gal[t].v_sigma_now;}
+model_nuclear_black_hole.c:                   else {Gal[t].type_v_sigma = 1; Gal[t].v_sigma_now = altura_number(Gal[t].type_v_sigma,t,n_step);}
+model_nuclear_black_hole.c:           else if(Gal[t].v_sigma_now <0 && Gal[p].v_sigma_now > 0)
+model_nuclear_black_hole.c:		       if(Smooth_accretion>0){Gal[t].type_v_sigma = 1; Gal[t].v_sigma_now =  Gal[p].v_sigma_now;}
+model_nuclear_black_hole.c:                       else {Gal[t].type_v_sigma = 1; Gal[t].v_sigma_now = altura_number(Gal[p].type_v_sigma,t,n_step);}
+model_nuclear_black_hole.c:           else if(Gal[t].v_sigma_now >0 && Gal[p].v_sigma_now > 0)
+model_nuclear_black_hole.c:                      {Gal[t].v_sigma_now = ( ((f_central + tmass)* Gal[t].v_sigma_now) + ( (f_satellite+pmass)*Gal[p].v_sigma_now) ) / (pmass + tmass + f_central+f_satellite); zzz = +1;}
+model_nuclear_black_hole.c:                          if((tbulge_mass + pmass)<=2e-9) Gal[t].v_sigma_now = altura_number(Gal[t].type_v_sigma,t,n_step);
+model_nuclear_black_hole.c:                          else Gal[t].v_sigma_now = ( (tbulge_mass* Gal[t].v_sigma_now) + (pmass*Gal[p].v_sigma_now) ) / (tbulge_mass+pmass);
+model_nuclear_black_hole.c:           if(Gal[t].v_sigma_now < 0) printf("Aqui esta el error, zzz = %d\n",zzz);
+model_nuclear_black_hole.c:           if(isnan(Gal[t].v_sigma_now) == 1) {printf("Error in add_galaxies_together(). The value of central v_sigma_now is nan!\n"); exit(0);}
+model_nuclear_black_hole.c:           Gal[p].v_sigma_now = -1;
+model_nuclear_black_hole.c:  printf("v_sigma_now = %f\n",Gal[t].v_sigma_now);
+model_nuclear_black_hole.c:  //printf("n_step = %d, m_ratio = %f, f_central = %f, tmass = %f, f_satellite = %f, pmass = %f, tbulge_mass = %f, Gal[t].v_sigma_now = %f\n",n_step,m_ratio,f_central,tmass,f_satellite,pmass,tbulge_mass,Gal[t].v_sigma_now);
+Coincidencia en el archivo binario model_nuclear_black_hole.o
+Coincidencia en el archivo binario model_profiles.o
+Coincidencia en el archivo binario model_reincorporation.o
+Coincidencia en el archivo binario model_spectro_photometric.o
+Coincidencia en el archivo binario model_spin_black_holes.o
+Coincidencia en el archivo binario model_starformation_and_feedback.o
+Coincidencia en el archivo binario model_stripping.o
+model_wandering_black_holes.c:           Gal[p].WBlHo[i].e_v_sigma_now = -1.;
+model_wandering_black_holes.c:        Gal[p].WBlHo[indx_wBH].e_v_sigma_now = -1.;
+model_wandering_black_holes.c:  Gal[gal_targ].WBlHo[wbh_targ].e_v_sigma_now = Gal[gal_obj].WBlHo[wbh_obj].e_v_sigma_now;
+model_wandering_black_holes.c:         if(fEdd > 0.) Self_Gravity_Accretion_Sesana_Model(gal_num,MBH_i,M_dot,fEdd,&a,&eta,epsilon,Gal[gal_num].WBlHo[i].e_v_sigma_now,dt,filenr);
+model_wandering_black_holes.c:                Gal[p].WBlHo[i].e_v_sigma_now = Gal[p].v_sigma_now;
+model_wandering_black_holes.c:             Gal[p].WBlHo[pos_BH_ejected_min].e_v_sigma_now = Gal[p].v_sigma_now;
+Coincidencia en el archivo binario model_wandering_black_holes.o
+Coincidencia en el archivo binario mymalloc.o
+Coincidencia en el archivo binario peano.o
+Coincidencia en el archivo binario post_process_spec_mags.o
+Coincidencia en el archivo binario read_parameters.o
+Coincidencia en el archivo binario save_galtree.o
+Coincidencia en el archivo binario save.o
+Coincidencia en el archivo binario scale_cosmology.o
+Coincidencia en el archivo binario star_formation_history.o
+Coincidencia en el archivo binario update_type_two.o

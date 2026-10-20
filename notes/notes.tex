@@ -1,0 +1,710 @@
+\documentclass[10.9pt,a4paper,twoside]{article}
+
+
+% ============================================================
+% CONFIGURACIÓN DE PÁGINA Y MÁRGENES
+% ============================================================
+\usepackage{geometry}
+
+\geometry{
+  a4paper,
+  left=2.0cm,
+  right=2.0cm,
+  tmargin=2.5cm,      % Margen superior total (baja todo el bloque)
+  bmargin=2.5cm,      % Margen inferior
+  headheight=14.5pt,
+  headsep=1.0cm,      % Espacio entre cabecera y texto
+  footskip=1.0cm
+}
+
+
+
+% ============================================================
+% CODIFICACIÓN Y LENGUAJE
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[none]{hyphenat}
+\usepackage{microtype}
+\emergencystretch=3em
+\sloppy
+
+% ============================================================
+% COLORES (DEBE IR ANTES DE OTROS PAQUETES)
+% ============================================================
+\PassOptionsToPackage{table,xcdraw,dvipsnames}{xcolor}
+\usepackage{xcolor}
+
+
+\definecolor{cobaltblue}{RGB}{0, 71, 171}
+\definecolor{pastelorange}{RGB}{255, 179, 71}
+\definecolor{firebrick}{rgb}{0.698, 0.133, 0.133}
+\definecolor{teal}{rgb}{0.0, 0.5, 0.5}
+\definecolor{steelblue}{rgb}{0.275, 0.51, 0.706}
+\definecolor{pastelpurple}{rgb}{0.412, 0.125, 0.627}  % #6920a0
+\definecolor{coral}{rgb}{1.0, 0.5, 0.31}
+
+
+% ============================================================
+% ESPACIADO Y MÁRGENES DE PÁRRAFO
+% ============================================================
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parindent}{1.5em}
+\usepackage{booktabs}
+
+
+% ============================================================
+% MATEMÁTICAS Y SÍMBOLOS
+% ============================================================
+
+\newcommand{\symbolfootnote}[2][1]{%
+  \begingroup
+  \renewcommand{\thefootnote}{\fnsymbol{footnote}}%
+  \footnote[#1]{#2}%
+  \endgroup
+}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{braket}
+
+\newcommand{\dd}{\mathrm{d}}
+
+
+% ============================================================
+% GRÁFICOS E IMÁGENES
+% ============================================================
+\usepackage{graphicx}
+\usepackage{pdfpages} 
+\usepackage{wrapfig}
+
+\usepackage{subcaption}
+
+\captionsetup{
+  font=small,
+  labelfont=bf
+}
+
+\captionsetup[subfigure]{
+  font=small,
+  labelfont=bf
+}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,decorations.pathreplacing}
+\usepackage{pgf-pie}
+
+\graphicspath{ {/home/alvch-ext/TFM/general/plots/} {/home/alvch-ext/TFM/general/scripts/nn/forward_nn} {/home/alvch-ext/TFM/general/scripts/nn/forward_nn/xai_plots/heads} {/home/alvch-ext/TFM/general/scripts/nn/forward_nn/weights} {/home/alvch-ext/TFM/general/scripts/nn/forward_nn/inference} {/home/alvch-ext/TFM/general/scripts/animations}} 
+
+
+% ============================================================
+% TABLAS
+% ============================================================
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{colortbl}
+
+
+% ============================================================
+% CÓDIGO Y LISTADOS
+% ============================================================
+\usepackage{listings}
+\usepackage{tcolorbox}
+
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  commentstyle=\color{green},
+  showspaces=false,
+  showstringspaces=false,
+  numberstyle=\tiny\color{gray},
+  numbers=left,
+  numbersep=5pt,
+  frame=single,
+  breaklines=true,
+}
+
+
+% ============================================================
+% ENCABEZADOS Y PIES DE PÁGINA
+% ============================================================
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot[\thepage]{\thepage}
+\lhead[\rightmark]{GW-LSS PhD}
+\rhead[Álvaro Cascales Hernández]{\rightmark}
+
+
+% ============================================================
+% UTILIDADES VARIAS
+% ============================================================
+\usepackage{cancel}
+\usepackage{pifont}
+\usepackage{eso-pic}     
+\usepackage{csquotes}     
+
+\usepackage[nointegrals]{wasysym}
+\newcommand{\galaxy}{\includegraphics[width=0.14in]{galaxy_symbol.jpg}}
+\usepackage{fontawesome}
+
+% ============================================================
+% HIPERVÍNCULOS (DEBE IR DESPUÉS DE COLORES)
+% ============================================================
+\usepackage{hyperref}
+
+
+\usepackage{cleveref}
+\crefname{figure}{figure}{figures}
+\crefname{table}{table}{tables}
+
+\hypersetup{
+    colorlinks=true,
+    citecolor=citationpurple,
+    linkcolor=teal,   % refs en teal
+    urlcolor=teal
+}
+
+\urlstyle{same}
+
+
+
+% ============================================================
+% TABLA DE CONTENIDOS Y REFERENCIAS
+% ============================================================
+\usepackage{tocloft}
+\usepackage[nottoc]{tocbibind}
+
+
+\renewcommand{\cftsecfont}{\normalfont\hypersetup{linkcolor=teal}}
+\renewcommand{\cftsubsecfont}{\normalfont\hypersetup{linkcolor=black}}
+\renewcommand{\cftsubsubsecfont}{\normalfont\hypersetup{linkcolor=gray}}
+
+
+
+% ============================================================
+% BIBLIOGRAFÍA 
+% ============================================================
+
+\usepackage[
+  backend=biber,
+  style=authoryear,
+  maxcitenames=2,
+  mincitenames=1,
+  maxbibnames=2,
+  minbibnames=1,
+  uniquename=false,
+  uniquelist=false,
+  giveninits=true,
+  doi=true,
+  url=false,
+  isbn=false,
+  eprint=false,
+  date=year,
+  hyperref=true
+]{biblatex}
+
+% Campos extra para ADS/bibcode
+\DeclareDatamodelFields[type=field,datatype=literal]{bibcode,adsurl}
+\DeclareDatamodelEntryfields{bibcode,adsurl}
+
+\usepackage{filecontents}
+\usepackage{multicol}
+
+% COLOR DE CITAS BIBLATEX
+\definecolor{citationpurple}{RGB}{105, 32, 160}
+
+\hypersetup{
+    citecolor=citationpurple
+}
+
+\DeclareFieldFormat{citehyperref}{%
+  \DeclareFieldAlias{bibhyperref}{noformat}%
+  \bibhyperref{#1}%
+}
+
+\DeclareFieldFormat{textcitehyperref}{%
+  \DeclareFieldAlias{bibhyperref}{noformat}%
+  \bibhyperref{#1}%
+}
+
+\savebibmacro{cite}
+\savebibmacro{textcite}
+
+\renewbibmacro*{cite}{%
+  \printtext[citehyperref]{%
+    \color{citationpurple}%
+    \restorebibmacro{cite}%
+    \usebibmacro{cite}%
+  }%
+}
+
+\renewbibmacro*{textcite}{%
+  \printtext[textcitehyperref]{%
+    \color{citationpurple}%
+    \restorebibmacro{textcite}%
+    \usebibmacro{textcite}%
+  }%
+}
+
+% ------------------------------------------------------------------
+% FORMATO DE NOMBRES EN BIBLIOGRAFÍA:
+% Asensio Ramos A. & Díaz Baso C. J.
+% Governato F. et al.
+% ------------------------------------------------------------------
+
+\DeclareNameFormat{author}{%
+  \nameparts{#1}%
+  \mkbibnamefamily{\namepartfamily}%
+  \ifdefvoid{\namepartgiveni}
+    {}
+    {\space\mkbibnamegiven{\namepartgiveni}}%
+  \ifdefvoid{\namepartsuffix}
+    {}
+    {\addcomma\space\mkbibnamesuffix{\namepartsuffix}}%
+  \ifnumless{\value{listcount}}{\value{liststop}}
+    {%
+      \ifnumequal{\value{listcount}}{\numexpr\value{liststop}-1\relax}
+        {\space\&\space}
+        {\addcomma\space}%
+    }
+    {}%
+  \usebibmacro{name:andothers}%
+}
+
+\DeclareNameAlias{editor}{author}
+\DeclareNameAlias{translator}{author}
+
+\DeclareDelimFormat[bib]{multinamedelim}{\addcomma\space}
+\DeclareDelimFormat[bib]{finalnamedelim}{\space\&\space}
+
+% ------------------------------------------------------------------
+% TÍTULOS, URLS Y DOI
+% ------------------------------------------------------------------
+
+% Títulos de artículos en cursiva
+\DeclareFieldFormat[article]{title}{\mkbibemph{#1}}
+\DeclareFieldFormat[inproceedings]{title}{\mkbibemph{#1}}
+\DeclareFieldFormat[book]{title}{\mkbibemph{#1}}
+
+% Journal sin formato extra
+\DeclareFieldFormat[article]{journaltitle}{#1}
+
+% DOI no impreso explícitamente
+\DeclareFieldFormat{doi}{}
+
+% URL visible explícitamente para webs/manual/software
+\DeclareFieldFormat{url}{\url{#1}}
+
+% Macro para hacer clicable el nombre de la revista:
+% - si hay DOI, enlaza al DOI
+% - si no hay DOI pero hay arXiv, enlaza al arXiv
+% - si no hay DOI/arXiv pero hay adsurl, enlaza a ADS
+% - si no hay DOI/arXiv/adsurl pero hay bibcode, construye enlace a ADS
+% - si no hay nada, imprime la revista normal
+\newbibmacro*{linkedjournal}{%
+  \iffieldundef{doi}
+    {%
+      \iffieldundef{eprint}
+        {%
+          \iffieldundef{bibcode}
+            {%
+              \iffieldundef{url}
+                {%
+                  \iffieldundef{shortjournal}
+                    {\printfield{journaltitle}}
+                    {\printfield{shortjournal}}%
+                }
+                {%
+                  \href{\thefield{url}}{%
+                    \iffieldundef{shortjournal}
+                      {\printfield{journaltitle}}
+                      {\printfield{shortjournal}}%
+                  }%
+                }%
+            }
+            {%
+              \href{https://ui.adsabs.harvard.edu/abs/\thefield{bibcode}/abstract}{%
+                \iffieldundef{shortjournal}
+                  {\printfield{journaltitle}}
+                  {\printfield{shortjournal}}%
+              }%
+            }%
+        }
+        {%
+          \href{https://arxiv.org/abs/\thefield{eprint}}{%
+            \iffieldundef{shortjournal}
+              {\printfield{journaltitle}}
+              {\printfield{shortjournal}}%
+          }%
+        }%
+    }
+    {%
+      \href{https://doi.org/\thefield{doi}}{%
+        \iffieldundef{shortjournal}
+          {\printfield{journaltitle}}
+          {\printfield{shortjournal}}%
+      }%
+    }%
+}
+
+% Quitar "In:" en artículos
+\renewbibmacro*{in:}{%
+  \ifentrytype{article}
+    {}
+    {\printtext{\bibstring{in}\intitlepunct}}%
+}
+
+% ------------------------------------------------------------------
+% DRIVER COMPACTO PARA ARTÍCULOS
+% Formato:
+% Governato F. et al., 2012, Title, MNRAS, 422, 1231
+% con la revista clicable si hay DOI/arXiv/ADS/bibcode
+% ------------------------------------------------------------------
+
+\DeclareBibliographyDriver{article}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \ifnameundef{author}
+    {\printnames{editor}}
+    {\printnames{author}}%
+  \setunit{\addcomma\space}%
+  \printfield{year}%
+  \setunit{\addcomma\space}%
+  \printfield{title}%
+  \setunit{\addcomma\space}%
+  \usebibmacro{linkedjournal}%
+  \setunit{\addcomma\space}%
+  \printfield{volume}%
+  \setunit{\addcomma\space}%
+  \iffieldundef{pages}
+    {\printfield{eid}}
+    {\printfield{pages}}%
+  \usebibmacro{finentry}%
+}
+
+% ------------------------------------------------------------------
+% DRIVER COMPACTO PARA INPROCEEDINGS
+% El título puede ser clicable si tiene URL/DOI/arXiv/ADS
+% ------------------------------------------------------------------
+
+\DeclareBibliographyDriver{inproceedings}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \ifnameundef{author}
+    {}
+    {\printnames{author}%
+     \setunit{\addcomma\space}}%
+  \printfield{year}%
+  \setunit{\addcomma\space}%
+  \setunit{\addcomma\space}%
+  \printfield{booktitle}%
+  \setunit{\addcomma\space}%
+  \printfield{pages}%
+  \usebibmacro{finentry}%
+}
+
+% ------------------------------------------------------------------
+% DRIVER COMPACTO PARA LIBROS
+% Sin vínculo en el título
+% ------------------------------------------------------------------
+
+\DeclareBibliographyDriver{book}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \ifnameundef{author}
+    {\printnames{editor}}
+    {\printnames{author}}%
+  \setunit{\addcomma\space}%
+  \printfield{year}%
+  \setunit{\addcomma\space}%
+  \printfield{title}%
+  \setunit{\addcomma\space}%
+  \printlist{publisher}%
+  \usebibmacro{finentry}%
+}
+
+% ------------------------------------------------------------------
+% DRIVER COMPACTO PARA WEBS / MISC
+% URL visible directamente
+% ------------------------------------------------------------------
+
+\DeclareBibliographyDriver{misc}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \ifnameundef{author}
+    {}
+    {\printnames{author}%
+     \setunit{\addcomma\space}}%
+  \printfield{year}%
+  \setunit{\addcomma\space}%
+  \printfield{title}%
+  \iffieldundef{url}
+    {}
+    {%
+      \setunit{\addcomma\space}%
+      \printfield{url}%
+    }%
+  \usebibmacro{finentry}%
+}
+
+% ------------------------------------------------------------------
+% DRIVER COMPACTO PARA MANUALES
+% URL visible directamente
+% ------------------------------------------------------------------
+
+\DeclareBibliographyDriver{manual}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \ifnameundef{author}
+    {}
+    {\printnames{author}%
+     \setunit{\addcomma\space}}%
+  \printfield{year}%
+  \setunit{\addcomma\space}%
+  \printfield{title}%
+  \iffieldundef{url}
+    {}
+    {%
+      \setunit{\addcomma\space}%
+      \printfield{url}%
+    }%
+  \usebibmacro{finentry}%
+}
+
+% ------------------------------------------------------------------
+% DRIVER COMPACTO PARA SOFTWARE
+% URL visible directamente
+% ------------------------------------------------------------------
+
+\DeclareBibliographyDriver{software}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \ifnameundef{author}
+    {}
+    {\printnames{author}%
+     \setunit{\addcomma\space}}%
+  \printfield{year}%
+  \setunit{\addcomma\space}%
+  \printfield{title}%
+  \setunit{\addcomma\space}%
+  \printlist{publisher}%
+  \iffieldundef{url}
+    {}
+    {%
+      \setunit{\addcomma\space}%
+      \printfield{url}%
+    }%
+  \usebibmacro{finentry}%
+}
+
+% ------------------------------------------------------------------
+% FORMATO COMPACTO PARA OTROS TIPOS DE ENTRADA
+% ------------------------------------------------------------------
+
+\renewbibmacro*{volume+number}{%
+  \printfield{volume}%
+  \setunit*{\addcomma\space}%
+  \printfield{pages}%
+  \setunit*{\addcomma\space}%
+}
+
+\renewbibmacro*{issue+date}{%
+  \iffieldundef{issue}
+    {}
+    {%
+      \setunit*{\addcomma\space}%
+      \printfield{issue}%
+    }%
+}
+
+% Limpiar campos que suelen ocupar espacio y no son esenciales
+\AtEveryBibitem{%
+  \clearfield{month}%
+  \clearfield{day}%
+  \clearfield{note}%
+  \clearfield{issn}%
+  \clearlist{language}%
+}
+
+% Bibliografía más compacta
+\renewcommand*{\bibfont}{\fontsize{11.0}{12.0}\selectfont}
+\setlength{\bibitemsep}{7pt}
+\setlength{\bibparsep}{0pt}
+\setlength{\bibhang}{1em}
+
+\addbibresource{References.bib}
+
+
+% ============================================================
+% NOMBRES Y ETIQUETAS
+% ============================================================
+\renewcommand{\labelenumi}{{\alph{enumi})}}
+\renewcommand{\contentsname}{Table of Contents}
+\renewcommand{\figurename}{\textbf{Figure}}
+\renewcommand\thefigure{\textbf{\arabic{figure}}}
+\renewcommand{\tablename}{\textbf{Table}}
+\renewcommand\thetable{\textbf{\arabic{table}}}
+
+
+\usepackage{enumitem}
+
+
+      
+\begin{document}
+\fontsize{11pt}{13.2pt}\selectfont
+
+\section*{Personal notes}
+
+\subsection*{02/10/2026: General view of the project}
+
+The general objective of my PhD is to investigate whether current and future Pulsar Timing Array (PTA) observations can place meaningful constraints on the stochastic gravitational-wave background and, through it, on the free parameters of our semi-analytic galaxy and massive-black-hole evolution models. \\
+
+The main physical pipeline will be based on the BACCO cosmological simulations, on top of which I will apply the \textsc{L-Galaxies} semi-analytic model. BACCO is preferred over fully hydrodynamical simulations because it provides a much larger volume and higher effective statistical power than what is currently feasible with hydrodynamical runs. This is especially important for studying rare massive systems and large-scale structure. Moreover, hydrodynamical simulations are not free of effective modelling assumptions either, since unresolved baryonic processes are still treated through sub-grid prescriptions. \\
+
+The final goal is to construct an emulator that learns a mapping of the form
+
+\[
+\left(
+\boldsymbol{\theta}_{\rm cosmo},
+\boldsymbol{\theta}_{\rm SAM}
+\right)
+\longrightarrow
+\mathbf{O}_{\rm GW},
+\]
+
+where $\boldsymbol{\theta}_{\rm cosmo}$ are the cosmological parameters of the underlying $N$-body simulation, $\boldsymbol{\theta}_{\rm SAM}$ are the free parameters entering \textsc{L-Galaxies}, and $\mathbf{O}_{\rm GW}$ represents one or several observables related to the massive black-hole binary population and the gravitational-wave background. \\
+
+A major practical difficulty is the construction of the training set. At present, there are only about ten BACCO simulations corresponding to different cosmologies. For each of these, the SAM can in principle be rerun many times with different values of $\boldsymbol{\theta}_{\rm SAM}$, so the astrophysical parameter space can be sampled relatively densely. However, the cosmological parameter space would remain much more sparsely sampled. Raúl thinks that this may still be sufficient to train the emulator, although I am not fully convinced yet. For this reason, I suggested exploring the possibility of applying a cosmological rescaling method to BACCO, analogous to the rescaling approach previously used for Millennium-type simulations. This could allow us to generate additional effective cosmologies and construct a more uniform one-to-one sampling of
+
+\[
+\left(
+\boldsymbol{\theta}_{\rm cosmo},
+\boldsymbol{\theta}_{\rm SAM}
+\right).
+\]
+
+This idea still needs to be tested carefully, since it is not yet clear whether cosmological rescaling is actually necessary or whether the existing BACCO cosmologies already provide enough information for the observables of interest. \\
+
+A second major bottleneck is the computational cost of \textsc{L-Galaxies}. Although running the SAM is far cheaper than rerunning an entire cosmological simulation, a full SAM realization can still take several hours. Therefore, one of the first methodological goals will be to investigate how the SAM can be made substantially more efficient. \\
+
+The idea discussed in the meeting was to work with representative subsamples of halos rather than processing the entire halo population. For example, if the simulation contains of order $10^7$ Milky-Way-like halos, I could randomly select a much smaller subset, perhaps of order $10^4$, run the SAM only on this subset, and then reconstruct the contribution of the full halo population statistically. I believe Raúl mentioned some form of weighting for this reconstruction, although I am not yet completely certain of the exact implementation. The basic idea would be to assign appropriate statistical weights to the sampled halos so that the reduced sample reproduces the abundance and distribution of the full population. If this works, a SAM run that currently takes hours could potentially be reduced to minutes. The faster this stage becomes, the larger the training set that can be generated for the neural-network emulator. \\
+
+Once the SAM pipeline is sufficiently fast, I need to determine which subset of parameters should actually be varied and calibrated. A sensible first step would be to construct a relatively small exploratory emulator using a limited number of runs but a broad set of input parameters. The purpose of this first emulator would not necessarily be high-precision inference, but rather sensitivity analysis. I want to determine which observables respond significantly to which parameters, identify degeneracies, and determine which parameters have negligible impact on the quantities of interest. \\
+
+This sensitivity stage is important for two reasons. First, it will help reduce the dimensionality of the final training set by selecting only the parameters that are sufficiently informative. Second, it can guide the choice of observables themselves. Rather than fixing the observables in advance, I can investigate which gravitational-wave, galaxy, or large-scale-structure quantities contain the most information about the parameters I want to constrain. \\
+
+An alternative strategy discussed in the meeting is to use \emph{active learning}. In that case, I would not generate the complete training set beforehand. Instead, I would start with an initial set of SAM realizations, train a preliminary emulator, and then use the current model uncertainty or information gain to decide which point in parameter space should be simulated next. Schematically,
+
+\[
+\mathcal{D}_0
+\longrightarrow
+\mathcal{E}_0
+\longrightarrow
+\boldsymbol{\theta}_{\rm next}
+\longrightarrow
+{\rm SAM}
+\longrightarrow
+\mathcal{D}_1
+\longrightarrow
+\mathcal{E}_1
+\longrightarrow
+\cdots
+\]
+
+where $\mathcal{D}_i$ is the available training set and $\mathcal{E}_i$ is the current emulator. \\
+
+The advantage of this approach is that the simulations are concentrated in the regions of parameter space where they are most informative, potentially avoiding a large number of redundant SAM runs. The disadvantage is that the training and simulation stages become coupled: instead of generating the whole dataset independently and training afterwards, I would repeatedly have to wait for new SAM runs before deciding where to sample next. However, this may still be more efficient overall, especially if the dimensionality of the parameter space is large. \\
+
+Related to this, I also need to investigate how the initial parameter space should be sampled. Sobol sequences are an obvious baseline because I already used them in my Master's project, but Raúl suggested that there may be more suitable alternatives. I therefore need to compare Sobol sampling with other space-filling or adaptive approaches, potentially including Latin-hypercube sampling, maximin designs, optimized space-filling schemes, or active-learning-based selection. \\
+
+Another important part of the project will be the likelihood. I need to understand the covariance structure of the observables at different physical scales. On sufficiently large and approximately linear scales, different modes may be close to statistically independent, so the covariance matrix may be approximately diagonal:
+
+\[
+\mathbf{C}
+\simeq
+{\rm diag}
+\left(
+\sigma_1^2,
+\sigma_2^2,
+\ldots
+\right).
+\]
+
+However, once I enter the quasi-linear or non-linear regime, gravitational evolution couples different modes, so off-diagonal terms may become important:
+
+\[
+C_{ij} \neq 0
+\qquad
+\text{for some } i\neq j.
+\]
+
+I therefore need to study how the covariance matrix changes with scale before deciding which likelihood approximation is appropriate. \\
+
+Once I have an ensemble of simulations or mocks, the most direct way to estimate the covariance of an observable vector
+
+\[
+\mathbf{x}
+=
+(x_1,\ldots,x_N)
+\]
+
+is through the sample covariance,
+
+\[
+C_{ij}
+=
+\frac{1}{N_{\rm sim}-1}
+\sum_{k=1}^{N_{\rm sim}}
+\left(
+x_i^{(k)}-\bar{x}_i
+\right)
+\left(
+x_j^{(k)}-\bar{x}_j
+\right),
+\]
+
+where $x_i^{(k)}$ is bin or mode $i$ in realization $k$, and $\bar{x}_i$ is the mean over realizations. \\
+
+It will probably be useful to inspect not only $\mathbf{C}$ itself but also the corresponding correlation matrix,
+
+\[
+R_{ij}
+=
+\frac{C_{ij}}
+{\sqrt{C_{ii}C_{jj}}},
+\]
+
+since this makes it easier to identify where off-diagonal correlations become relevant. I still need to clarify whether Raúl expects this covariance to be estimated at fixed cosmology and SAM parameters from multiple realizations, from subvolume resampling, from mocks, or from some other procedure. \\
+
+We also discussed the possibility of comparing the cosmological constraints obtained from small-scale or local-Universe information with the constraints derived from Planck. My understanding is that the goal may be to test whether cosmological information inferred from the low-redshift and relatively small-scale Universe is consistent with the large-scale early-Universe constraints from the CMB. I am not completely certain that this was exactly what Raúl meant, so this point should remain tentative for now. \\
+
+The stellar mass function was also mentioned as a potentially useful observable. I am not yet fully sure in which part of the pipeline Raúl wants to use it, but one likely role is as an additional galaxy-level constraint on the SAM. Since the gravitational-wave background depends on the properties and evolution of galaxies and massive black holes, using the stellar mass function could help prevent the SAM from reproducing the PTA signal by moving into regions of parameter space that are inconsistent with the observed galaxy population. In that sense, one could imagine a joint constraint of the form
+
+\[
+\mathcal{L}_{\rm total}
+=
+\mathcal{L}_{\rm PTA}
+\times
+\mathcal{L}_{\rm SMF}
+\times
+\cdots,
+\]
+
+although I need to confirm whether this is indeed what was intended. \\
+
+Another point discussed was the use of a simulation corresponding to a fixed cosmology intended to represent our actual Universe as closely as possible. I am not yet completely sure what role this run will play. My current interpretation is that it could serve either as a fiducial reference universe or as a controlled test case. For example, one possibility would be to fix $\boldsymbol{\theta}_{\rm cosmo}$ to the reference values and use real PTA observations to constrain only $\boldsymbol{\theta}_{\rm SAM}$. Another possibility would be to treat this simulation as a mock truth and test whether the full inference pipeline can recover its known input parameters. \\
+
+Lightcones were also discussed. Their role will be to convert the simulated galaxy and black-hole population into an observer-centred representation, in which objects are placed at the appropriate sky coordinates and redshifts along the past lightcone. This will become especially important if I want to compare directly with survey geometry, construct realistic mock observations, study angular clustering, or combine gravitational-wave information with galaxy surveys such as DESI. I still need to understand in more detail exactly which observables in the PhD will require lightcones and at what stage they will enter the pipeline. \\
+
+Finally, I will need to construct merger trees for the BACCO simulations. These trees will provide the time-connected halo and subhalo histories required by \textsc{L-Galaxies} to evolve galaxies and massive black holes consistently across cosmic time. \\
+
+For the coming week, in addition to continuing the literature review, my first technical objectives are therefore to begin learning how to access and inspect the BACCO simulations, understand how the merger trees are constructed, and start learning how to compile and run \textsc{L-Galaxies}. I do not interpret this as needing to master or complete all three tasks within one week, but rather as making first technical contact with each component and identifying the software, data structure, and workflow required for the full pipeline.
+
+
+\end{document}

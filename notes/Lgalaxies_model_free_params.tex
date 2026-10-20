@@ -1,0 +1,499 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{microtype}
+
+\geometry{margin=2.3cm}
+\hypersetup{colorlinks=true,linkcolor=blue!60!black,urlcolor=blue!60!black}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+
+\definecolor{freeblue}{RGB}{220,235,250}
+\definecolor{fixedgray}{RGB}{238,238,238}
+\definecolor{accent}{RGB}{36,89,145}
+
+\newcommand{\freeparam}[2]{%
+  \colorbox{freeblue}{\parbox{0.95\linewidth}{\textbf{Free parameter:} $\boldsymbol{#1}$ --- #2}}%
+}
+
+\newcommand{\fixedparam}[2]{%
+  \colorbox{fixedgray}{\parbox{0.95\linewidth}{\textbf{Fixed/relevant parameter:} $\boldsymbol{#1}$ --- #2}}%
+}
+
+\title{\textbf{L-Galaxies: physical processes, equations, and free parameters}\\
+\large Summary of the Supplementary Material of Henriques et al. (2015)}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Purpose of this document}
+This document collects the main equations of the semi-analytic model \textit{L-Galaxies} described in the Supplementary Material of Henriques et al. (2015), explicitly highlighting the free parameters calibrated through MCMC and explaining their physical role.
+
+The model follows, along dark-matter \textit{merger trees}, the coupled evolution of several baryonic reservoirs: hot gas, cold gas, ejected gas, stars in discs and bulges, intracluster light, and central supermassive black holes.
+
+\section{Baryon infall and reionization}
+In the absence of photoionization feedback, each halo would contain the cosmic baryon fraction. Reionization reduces the amount of gas that can collapse into low-mass haloes:
+
+\begin{equation}
+ f_b(z,M_{200c}) = f_b^{\rm cos}
+ \left[
+ 1+\left(2^{\alpha/3}-1\right)
+ \left(\frac{M_{200c}}{M_F(z)}\right)^{-\alpha}
+ \right]^{-3/\alpha}.
+ \tag{S2}
+\end{equation}
+
+Here $M_F(z)$ is the \textit{filtering mass}. For $M_{200c}\ll M_F$, the baryon fraction is strongly suppressed.
+
+\fixedparam{\alpha=2}{Controls the shape of the baryon suppression caused by reionization. It is not varied in the MCMC analysis of this work.}
+
+\section{Cooling of hot gas}
+The local cooling time is modeled as
+
+\begin{equation}
+ t_{\rm cool}(r)=
+ \frac{3\mu m_H k T_{200c}}
+ {2\rho_{\rm hot}(r)\Lambda(T_{\rm hot},Z_{\rm hot})},
+ \tag{S3}
+\end{equation}
+
+assuming an isothermal hot atmosphere
+
+\begin{equation}
+ \rho_{\rm hot}(r)=\frac{M_{\rm hot}}{4\pi R_{200c}r^2}.
+ \tag{S4}
+\end{equation}
+
+The cooling radius is obtained by imposing $t_{\rm cool}(r_{\rm cool})=t_{\rm dyn,h}$:
+
+\begin{equation}
+ r_{\rm cool}=\left[
+ \frac{t_{\rm dyn,h}M_{\rm hot}\Lambda(T_{\rm hot},Z_{\rm hot})}
+ {6\pi\mu m_H kT_{200c}R_{200c}}
+ \right]^{1/2}.
+ \tag{S5}
+\end{equation}
+
+If $r_{\rm cool}<R_{200c}$, the halo is in the cooling-flow regime:
+
+\begin{equation}
+ \dot M_{\rm cool}=M_{\rm hot}\frac{r_{\rm cool}}{R_{200c}}\frac{1}{t_{\rm dyn,h}}.
+ \tag{S6}
+\end{equation}
+
+If $r_{\rm cool}>R_{200c}$, the gas is in the rapid-infall regime:
+
+\begin{equation}
+ \dot M_{\rm cool}=\frac{M_{\rm hot}}{t_{\rm dyn,h}}.
+ \tag{S7}
+\end{equation}
+
+In this implementation, cooling introduces no free parameters in the MCMC analysis.
+
+\section{Disc formation and sizes}
+The angular momentum of the gaseous disc changes because of cooling, star formation, reheating, and mergers:
+
+\begin{align}
+ \Delta \vec J_{\rm gas} &=
+ \frac{\vec J_{\rm DM}}{M_{\rm DM}}\dot M_{\rm cool}\Delta t
+ -\frac{\vec J_{\rm gas}}{M_{\rm gas}}
+ \left[(1-R_{\rm ret})\dot M_\star\Delta t+\Delta M_{\rm reheat}\right] \\
+ &\quad +\frac{\vec J_{\rm DM}}{M_{\rm DM}}M_{\rm sat,gas}.
+ \tag{S9}
+\end{align}
+
+The scale lengths are
+
+\begin{equation}
+ R_{\rm gas}=\frac{J_{\rm gas}/M_{\rm gas}}{2V_{\max}},
+ \tag{S10}
+\end{equation}
+
+\begin{equation}
+ R_\star=\frac{J_\star/M_{\star,d}}{2V_{\max}}.
+ \tag{S11}
+\end{equation}
+
+Exponential surface-density profiles are adopted for gas and stars:
+
+\begin{equation}
+ \Sigma_{\rm gas}(R)=\Sigma_{{\rm gas},0}e^{-R/R_{\rm gas}},
+ \tag{S12}
+\end{equation}
+
+\begin{equation}
+ \Sigma_\star(R)=\Sigma_{\star,0}e^{-R/R_\star}.
+ \tag{S13}
+\end{equation}
+
+\section{Quiescent star formation}
+The star formation rate is
+
+\begin{equation}
+ \boxed{\dot M_\star=\alpha_{\rm SF}
+ \frac{M_{\rm gas}-M_{\rm crit}}{t_{\rm dyn,disk}}},
+ \qquad
+ t_{\rm dyn,disk}=\frac{R_\star}{V_{\max}}.
+ \tag{S14}
+\end{equation}
+
+The gas threshold for star formation is
+
+\begin{equation}
+ \boxed{M_{\rm crit}=M_{{\rm crit},0}
+ \left(\frac{V_{200c}}{200\,\mathrm{km\,s^{-1}}}\right)
+ \left(\frac{R_{\rm gas}}{10\,\mathrm{kpc}}\right)}.
+ \tag{S15}
+\end{equation}
+
+\freeparam{\alpha_{\rm SF}}{Star formation efficiency per disc dynamical time. Increasing it converts cold gas into stars more rapidly. Best fit: $0.025$ (2$\sigma$: $0.021$--$0.029$).}
+
+\freeparam{M_{{\rm crit},0}}{Normalization of the minimum gas-mass threshold required for star formation. A lower value allows gas-poor galaxies to keep forming stars for longer. Best fit: $2.4\times10^9\,M_\odot$.}
+
+\fixedparam{R_{\rm ret}=0.43}{Fraction of newly formed stellar mass that is instantaneously returned to the cold gas by stellar evolution, assuming a Chabrier IMF.}
+
+\section{Supernova feedback}
+\subsection{Available energy}
+The effective energy supplied by supernovae and stellar winds is
+
+\begin{equation}
+ \Delta E_{\rm SN}=\epsilon_{\rm halo}\frac{1}{2}\Delta M_\star V_{\rm SN}^2,
+ \tag{S16}
+\end{equation}
+
+with
+
+\begin{equation}
+ \boxed{\epsilon_{\rm halo}=\eta\left[
+ 0.5+\left(\frac{V_{\max}}{V_{\rm eject}}\right)^{-\beta_2}
+ \right]}.
+ \tag{S17}
+\end{equation}
+
+\freeparam{\eta}{Normalization of the SN feedback energy efficiency. Best fit: $0.62$.}
+
+\freeparam{V_{\rm eject}}{Velocity scale controlling where the ejection efficiency begins to saturate. Best fit: $100\,\mathrm{km\,s^{-1}}$.}
+
+\freeparam{\beta_2}{Slope of the ejection dependence on $V_{\max}$. It controls how much more efficient feedback becomes in low-mass haloes. Best fit: $0.80$.}
+
+\subsection{Reheating of cold gas}
+The mass of cold gas reheated into the hot atmosphere is
+
+\begin{equation}
+ \Delta M_{\rm reheat}=\epsilon_{\rm disk}\Delta M_\star,
+ \tag{S18}
+\end{equation}
+
+with
+
+\begin{equation}
+ \boxed{\epsilon_{\rm disk}=\epsilon\left[
+ 0.5+\left(\frac{V_{\max}}{V_{\rm reheat}}\right)^{-\beta_1}
+ \right]}.
+ \tag{S19}
+\end{equation}
+
+\freeparam{\epsilon}{Normalization of the \textit{mass-loading factor}, i.e. the amount of cold gas reheated per unit stellar mass formed. Best fit: $2.6$.}
+
+\freeparam{V_{\rm reheat}}{Velocity scale of the reheating efficiency. Best fit: $480\,\mathrm{km\,s^{-1}}$.}
+
+\freeparam{\beta_1}{Slope of the mass-loading dependence on $V_{\max}$. Best fit: $0.72$.}
+
+If energy remains after reheating, it is used to eject gas from the halo:
+
+\begin{equation}
+ \frac{1}{2}\Delta M_{\rm eject}V_{200c}^2
+ =\Delta E_{\rm SN}-\Delta E_{\rm reheat}.
+ \tag{S20}
+\end{equation}
+
+\section{Reincorporation of ejected gas}
+The mass stored in the external reservoir returns to the halo according to
+
+\begin{equation}
+ \dot M_{\rm ejec}=-\frac{M_{\rm ejec}}{t_{\rm reinc}},
+ \tag{S21}
+\end{equation}
+
+with
+
+\begin{equation}
+ \boxed{t_{\rm reinc}=\gamma\frac{10^{10}M_\odot}{M_{200c}}}.
+ \tag{S22}
+\end{equation}
+
+\freeparam{\gamma}{Sets the reincorporation timescale. Increasing $\gamma$ makes ejected gas take longer to return. Since $t_{\rm reinc}\propto M_{200c}^{-1}$, the effect is especially strong in low-mass haloes. Best fit: $3.0\times10^{10}\,\mathrm{yr}$.}
+
+This dependence is crucial for delaying the growth of low-mass galaxies and reproducing \textit{downsizing}.
+
+\section{Chemical enrichment}
+The model tracks the total mass in metals through an effective yield $y$.
+
+\freeparam{y}{Mass of newly produced metals per unit stellar mass formed. Newly produced metals are instantaneously mixed with the cold gas. Best fit: $0.046$.}
+
+\section{Black-hole growth: quasar mode}
+During a merger, a fraction of the cold gas is accreted by the central black hole:
+
+\begin{equation}
+ \boxed{\Delta M_{\rm BH,Q}=
+ \frac{f_{\rm BH}(M_{\rm sat}/M_{\rm cen})M_{\rm cold}}
+ {1+(V_{\rm BH}/V_{200c})^2}}.
+ \tag{S23}
+\end{equation}
+
+\freeparam{f_{\rm BH}}{Normalization of the cold-gas accretion efficiency during mergers. Best fit: $0.041$.}
+
+\freeparam{V_{\rm BH}}{Velocity scale controlling the suppression of accretion in shallow potential wells and its saturation in massive haloes. Best fit: $750\,\mathrm{km\,s^{-1}}$.}
+
+After the merger,
+
+\begin{equation}
+ M_{\rm BH,f}=M_{\rm BH,1}+M_{\rm BH,2}+\Delta M_{\rm BH,Q}.
+\end{equation}
+
+In this version of the model, black holes are assumed to merge when their host galaxies merge.
+
+\section{Radio-mode AGN feedback}
+Accretion from the hot atmosphere is modeled as
+
+\begin{equation}
+ \boxed{\dot M_{\rm BH}=k_{\rm AGN}
+ \left(\frac{M_{\rm hot}}{10^{11}M_\odot}\right)
+ \left(\frac{M_{\rm BH}}{10^8M_\odot}\right)}.
+ \tag{S24}
+\end{equation}
+
+\freeparam{k_{\rm AGN}}{Normalization of hot-mode accretion. Increasing it enhances halo heating and promotes quenching in massive galaxies. Best fit: $5.3\times10^{-3}\,M_\odot\,\mathrm{yr^{-1}}$.}
+
+The mechanical heating rate is
+
+\begin{equation}
+ \dot E_{\rm radio}=\eta_{\rm rad}\dot M_{\rm BH}c^2,
+ \tag{S25}
+\end{equation}
+
+with $\eta_{\rm rad}=0.1$, and it reduces the effective cooling rate according to
+
+\begin{equation}
+ \boxed{\dot M_{\rm cool,eff}=\max\left[
+ \dot M_{\rm cool}-\frac{2\dot E_{\rm radio}}{V_{200c}^2},0
+ \right]}.
+ \tag{S26}
+\end{equation}
+
+This is the main quenching mechanism in massive galaxies.
+
+\section{Tidal stripping of hot gas}
+The hot gas of a satellite is stripped approximately in proportion to its dark-matter mass loss:
+
+\begin{equation}
+ \frac{M_{\rm hot}(R_{\rm tidal})}{M_{\rm hot,infall}}
+ =\frac{M_{\rm DM}}{M_{\rm DM,infall}},
+ \tag{S27}
+\end{equation}
+
+\begin{equation}
+ R_{\rm tidal}=\left(\frac{M_{\rm DM}}{M_{\rm DM,infall}}\right)R_{\rm DM,infall}.
+ \tag{S28}
+\end{equation}
+
+This introduces no additional MCMC free parameters.
+
+\section{Ram-pressure stripping}
+Stripping proceeds down to the radius where ram pressure balances the satellite restoring force:
+
+\begin{equation}
+ \rho_{\rm sat}(R_{\rm rp})V_{\rm sat}^2
+ =\rho_{\rm par}(R)V_{\rm orbit}^2.
+ \tag{S29}
+\end{equation}
+
+In Henriques et al. (2015), this process operates only if the host halo exceeds a minimum mass.
+
+\freeparam{M_{\rm rp}}{Minimum host-halo mass required for ram-pressure stripping to operate. A higher value allows satellites in lower-mass groups to retain their gas and remain star forming. Best fit: $1.2\times10^{14}\,M_\odot$.}
+
+\section{Tidal disruption of satellites}
+An orphan satellite is disrupted if the density of the main halo at pericentre exceeds the internal density of the satellite:
+
+\begin{equation}
+ \boxed{
+ \frac{M_{\rm DM,halo}(R_{\rm peri})}{R_{\rm peri}^3}
+ >
+ \frac{M_{\rm sat}}{R_{\rm sat,half}^3}}
+ \tag{S30}
+\end{equation}
+
+Its stars are added to the intracluster light, while its cold gas is transferred to the hot atmosphere of the central galaxy.
+
+\section{Dynamical friction and merger time}
+After the subhalo is disrupted, the orbital-decay time of the orphan is modeled as
+
+\begin{equation}
+ \boxed{t_{\rm friction}=\alpha_{\rm friction}
+ \frac{V_{200c}r_{\rm sat}^2}
+ {GM_{\rm sat}\ln\Lambda}},
+ \tag{S32}
+\end{equation}
+
+with
+
+\begin{equation}
+ \ln\Lambda=\ln\left(1+\frac{M_{200c}}{M_{\rm sat}}\right).
+\end{equation}
+
+\freeparam{\alpha_{\rm friction}}{Multiplicative normalization of the dynamical-friction timescale. A larger value delays satellite/orphan mergers. Best fit: $2.5$.}
+
+\section{Major and minor mergers}
+A merger is classified as major when
+
+\begin{equation}
+ \frac{M_{\rm small}}{M_{\rm large}}>R_{\rm merger}.
+\end{equation}
+
+\fixedparam{R_{\rm merger}=0.1}{Threshold separating major and minor mergers. It affects morphology, bulge growth, and starbursts, but in this work it is fixed manually and not included in the MCMC.}
+
+\section{Merger-induced starbursts}
+The stellar mass formed in a burst is
+
+\begin{equation}
+ \boxed{M_{\star,\rm burst}=\alpha_{\rm SF,burst}
+ \left(\frac{M_1}{M_2}\right)^{\beta_{\rm SF,burst}}M_{\rm cold}},
+ \qquad M_1<M_2.
+ \tag{S33}
+\end{equation}
+
+\freeparam{\alpha_{\rm SF,burst}}{Normalization of the starburst efficiency. Best fit: $0.60$.}
+
+\freeparam{\beta_{\rm SF,burst}}{Controls how strongly the burst efficiency depends on merger mass ratio. A larger value makes near-equal-mass mergers much more efficient than minor mergers. Best fit: $1.9$.}
+
+\section{Bulge formation and size}
+The size of the remnant bulge is obtained from energy conservation:
+
+\begin{equation}
+ \frac{GM_{\rm new,bulge}^2}{R_{\rm new,bulge}}
+ =\frac{GM_1^2}{R_1}
+ +\frac{GM_2^2}{R_2}
+ +2\alpha_{\rm inter}\frac{GM_1M_2}{R_1+R_2}.
+ \tag{S34}
+\end{equation}
+
+\fixedparam{\alpha_{\rm inter}=0.5}{Controls the contribution of orbital binding energy in mergers. For material transferred to the bulge by disc instability, $\alpha_{\rm inter}=2$ is used. It is not varied in the MCMC.}
+
+\section{Disc instabilities}
+The disc is considered unstable if
+
+\begin{equation}
+ \boxed{V_{\max}<\sqrt{\frac{GM_{\star,d}}{3R_{\star,d}}}}.
+ \tag{S35}
+\end{equation}
+
+When this criterion is satisfied, the minimum stellar mass required to restore marginal stability is transferred from the disc to the bulge.
+
+\section{Dust attenuation}
+For the diffuse ISM:
+
+\begin{equation}
+ \tau_\lambda^{\rm ISM}=(1+z)^{-1}
+ \left(\frac{A_\lambda}{A_V}\right)_{Z_\odot}
+ \left(\frac{Z_{\rm gas}}{Z_\odot}\right)^s
+ \left(\frac{\langle N_H\rangle}{2.1\times10^{21}\,\mathrm{cm^{-2}}}\right),
+ \tag{S37}
+\end{equation}
+
+with
+
+\begin{equation}
+ \langle N_H\rangle=\frac{M_{\rm cold}}
+ {1.4m_p\pi(aR_{\rm gas,d})^2}.
+ \tag{S38}
+\end{equation}
+
+For stellar birth clouds:
+
+\begin{equation}
+ \tau_\lambda^{\rm BC}=\tau_\lambda^{\rm ISM}
+ \left(\frac{1}{\mu}-1\right)
+ \left(\frac{\lambda}{5500\,\text{\AA}}\right)^{-0.7}.
+ \tag{S39}
+\end{equation}
+
+These quantities are not part of the main MCMC parameter set of Henriques et al. (2015).
+
+\newpage
+
+\section{Summary of free parameters}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{6.2cm}>{\raggedleft\arraybackslash}p{2.2cm}}
+\toprule
+\textbf{Process} & \textbf{Parameter} & \textbf{Main physical effect} & \textbf{Best fit}\\
+\midrule
+\endhead
+Star formation & $\alpha_{\rm SF}$ & Quiescent SF efficiency per dynamical time & 0.025\\
+Star formation & $M_{{\rm crit},0}$ & Gas threshold for star formation & $2.4\times10^9 M_\odot$\\
+Starburst & $\alpha_{\rm SF,burst}$ & Normalization of merger-induced SF & 0.60\\
+Starburst & $\beta_{\rm SF,burst}$ & Burst dependence on merger mass ratio & 1.9\\
+AGN radio & $k_{\rm AGN}$ & Normalization of hot-gas accretion & $5.3\times10^{-3} M_\odot\,\mathrm{yr}^{-1}$\\
+BH quasar & $f_{\rm BH}$ & Cold-gas accretion efficiency in mergers & 0.041\\
+BH quasar & $V_{\rm BH}$ & Velocity scale of quasar-mode accretion & 750 km s$^{-1}$\\
+SN reheating & $\epsilon$ & Normalization of the mass loading & 2.6\\
+SN reheating & $V_{\rm reheat}$ & Velocity scale of reheating & 480 km s$^{-1}$\\
+SN reheating & $\beta_1$ & Mass-loading slope with $V_{\max}$ & 0.72\\
+SN ejection & $\eta$ & Energy efficiency of ejection & 0.62\\
+SN ejection & $V_{\rm eject}$ & Velocity scale of ejection & 100 km s$^{-1}$\\
+SN ejection & $\beta_2$ & Ejection slope with $V_{\max}$ & 0.80\\
+Reincorporation & $\gamma$ & Timescale normalization for ejected-gas return & $3.0\times10^{10}$ yr\\
+Environment & $M_{\rm rp}$ & Mass threshold for ram-pressure stripping & $1.2\times10^{14} M_\odot$\\
+Mergers & $\alpha_{\rm friction}$ & Normalization of dynamical-friction time & 2.5\\
+Metals & $y$ & Metal yield per unit stellar mass formed & 0.046\\
+\bottomrule
+\end{longtable}
+
+
+\section{Parameters most relevant for the GW--LSS project}
+The following ranking is a \emph{project-specific prioritization}, rather than a statement made by Henriques et al. (2015). It highlights the parameters that are likely to matter most when using BACCO merger trees together with \textit{L-Galaxies} to model galaxy mergers, massive black holes, and gravitational-wave source populations.
+
+\newpage
+
+\renewcommand{\arraystretch}{1.25}
+\begin{longtable}{>{\raggedright\arraybackslash}p{2.0cm}>{\raggedright\arraybackslash}p{3.7cm}>{\raggedright\arraybackslash}p{8.0cm}}
+\toprule
+\textbf{Priority} & \textbf{Parameters} & \textbf{Why they are relevant}\\
+\midrule
+\endhead
+Very high & $\alpha_{\rm friction}$ & Controls the dynamical-friction timescale after a satellite subhalo is no longer resolved, and therefore directly affects the timing and rate of galaxy mergers.\\
+Very high & $f_{\rm BH}$, $V_{\rm BH}$ & Control quasar-mode black-hole growth during galaxy mergers. They directly affect the black-hole masses that can later enter massive black-hole binaries and hence the expected GW-source mass distribution.\\
+Very high & $k_{\rm AGN}$ & Controls radio-mode AGN feedback. It regulates cooling and quenching in massive galaxies, indirectly affecting their gas content, stellar growth, and the black-hole--galaxy relation.\\
+High & $\alpha_{\rm SF,burst}$, $\beta_{\rm SF,burst}$ & Set the strength and mass-ratio dependence of merger-triggered starbursts. They are relevant because the same merger event also drives quasar-mode black-hole growth.\\
+High & $\epsilon$, $V_{\rm reheat}$, $\beta_1$, $\eta$, $V_{\rm eject}$, $\beta_2$, $\gamma$ & Control supernova reheating, gas ejection, and reincorporation. They strongly affect stellar mass, cold-gas content, and galaxy growth, especially at low mass, and therefore change the properties of the galaxies and black holes that eventually merge.\\
+Medium & $\alpha_{\rm SF}$, $M_{{\rm crit},0}$ & Regulate quiescent star formation and the amount of cold gas converted into stars before mergers occur. Their influence on GW-source populations is mostly indirect through galaxy mass and gas content.\\
+Medium--low & $M_{\rm rp}$ & Controls when ram-pressure stripping operates. It mainly affects satellite quenching and is likely to be secondary unless environmental dependence is itself an observable of interest.\\
+Low & $y$ & Controls metal enrichment. It is important for galaxy metallicities and photometry, but has only an indirect connection to merger rates and massive-black-hole GW observables.\\
+\bottomrule
+\end{longtable}
+
+A useful minimal parameter subset for a first sensitivity study would therefore be
+\begin{equation*}
+\boxed{\left\{\alpha_{\rm friction},\,f_{\rm BH},\,V_{\rm BH},\,k_{\rm AGN}\right\}},
+\end{equation*}
+with supernova-feedback and reincorporation parameters added afterwards to quantify how uncertainties in galaxy formation propagate into the predicted massive-black-hole population.
+
+It is also important to distinguish galaxy mergers from black-hole coalescences. In this version of \textit{L-Galaxies}, black holes are merged when their host galaxies merge; the subsequent stages of massive-black-hole-binary formation, orbital hardening, and delayed coalescence are not explicitly modelled. For GW applications, an additional prescription for these delays can therefore be at least as important as several of the standard SAM parameters.
+
+
+\section*{Reference}
+Henriques, B. M. B. et al. (2015), \textit{Galaxy formation in the Planck cosmology -- I. Matching the observed evolution of star formation rates, colours and stellar masses}, MNRAS, 451, 2663--2680, Supplementary Material.
+
+\end{document}

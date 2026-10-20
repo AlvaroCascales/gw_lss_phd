@@ -1,0 +1,713 @@
+\documentclass[11pt,a4paper]{article}
+
+% -----------------------------------------------------------------------------
+% L-GalaxiesBH manual
+% Scientific description based primarily on Bonoli et al. (2025), with the
+% inherited galaxy-formation model summarised following Henriques et al. (2015).
+% Operational commands are intentionally templates: the paper does not define
+% the repository-specific build system, executable name, parameter-file syntax,
+% or output schema.
+% -----------------------------------------------------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs,longtable,array,tabularx}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+\geometry{margin=2.4cm,headheight=14pt}
+\definecolor{accent}{RGB}{31,78,121}
+\definecolor{lightblue}{RGB}{235,243,250}
+\definecolor{lightgray}{RGB}{245,246,247}
+\definecolor{codegreen}{RGB}{35,115,75}
+\definecolor{codegray}{RGB}{95,95,95}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=accent,
+  citecolor=accent,
+  urlcolor=accent,
+  pdftitle={L-GalaxiesBH: Scientific and Operational Manual},
+  pdfsubject={Semi-analytic galaxy formation and massive black-hole evolution}
+}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.48em}
+\setlist[itemize]{leftmargin=1.5em,itemsep=0.15em,topsep=0.25em}
+\setlist[enumerate]{leftmargin=1.7em,itemsep=0.2em,topsep=0.25em}
+\renewcommand{\arraystretch}{1.15}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small L-GalaxiesBH manual}
+\fancyhead[R]{\small Scientific model and code workflow}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lstdefinestyle{shell}{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{lightgray},
+  frame=single,
+  rulecolor=\color{black!15},
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  commentstyle=\color{codegreen},
+  keywordstyle=\color{accent},
+  numbers=none,
+  xleftmargin=0.4em,
+  xrightmargin=0.4em,
+  aboveskip=0.6em,
+  belowskip=0.6em
+}
+\lstset{style=shell}
+
+\newcommand{\Msun}{\mathrm{M}_{\odot}}
+\newcommand{\Mbh}{M_{\rm BH}}
+\newcommand{\Mbhb}{\mathrm{MBHB}}
+\newcommand{\Mhalo}{M_{\rm halo}}
+\newcommand{\Mgas}{M_{\rm gas}}
+\newcommand{\Mhot}{M_{\rm hot}}
+\newcommand{\Mres}{M_{\rm res}}
+\newcommand{\Edd}{\mathrm{Edd}}
+\newcommand{\Lgal}{\textsc{L-Galaxies}}
+\newcommand{\Lgalbh}{\textsc{L-GalaxiesBH}}
+\newcommand{\note}[1]{\par\noindent\colorbox{lightblue}{\parbox{0.96\linewidth}{\textbf{Note.} #1}}\par}
+
+\begin{document}
+
+% -----------------------------------------------------------------------------
+% Cover page
+% -----------------------------------------------------------------------------
+\begin{titlepage}
+  \centering
+  \vspace*{1.4cm}
+  {\color{accent}\rule{\linewidth}{1.4pt}}\\[1.0cm]
+  {\Huge\bfseries\color{accent} L-GalaxiesBH}\\[0.35cm]
+  {\LARGE Scientific and Operational Manual}\\[0.8cm]
+  {\large Semi-analytic galaxy formation, massive black-hole growth, and binary evolution}\\[1.0cm]
+  {\color{accent}\rule{0.72\linewidth}{0.8pt}}\\[1.1cm]
+  \begin{minipage}{0.82\textwidth}
+    \centering
+    \large
+    A practical guide to the physical prescriptions, model variants, simulation inputs, and a reproducible workflow for running and checking \Lgalbh.
+  \end{minipage}
+  \vfill
+  \begin{tabular}{rl}
+    \textbf{Document version:} & 1.0 \\
+    \textbf{Date:} & \today \\
+    \textbf{Main model reference:} & Bonoli et al. (2025) \\
+    \textbf{Galaxy-formation reference:} & Henriques et al. (2015)
+  \end{tabular}
+  \vspace{0.7cm}
+  \begin{minipage}{0.9\textwidth}
+    \tiny\color{codegray}
+    This manual describes the published model and gives a repository-independent workflow. Exact build commands, executable names, parameter-file keys, and output filenames must be taken from the particular source-code checkout being used; they are not specified in the cited paper and are therefore not guessed here.
+  \end{minipage}
+  \vspace{0.7cm}
+  {\color{accent}\rule{\linewidth}{1.4pt}}
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+% -----------------------------------------------------------------------------
+\section{Purpose, scope, and conventions}
+
+\Lgalbh{} is a branch of the semi-analytic galaxy-formation model \Lgal{} designed to follow the formation, growth, spin evolution, dynamical evolution, and mergers of massive black holes (MBHs) inside evolving galaxies. It combines baryonic prescriptions with dark-matter halo merger trees extracted from cosmological $N$-body simulations. The model is described in detail in \citet{Bonoli2025}; the galaxy-formation framework inherited by the version used in that work follows \citet{Henriques2015}.
+
+This manual has two complementary aims:
+\begin{itemize}
+  \item explain the main physical modules and how information flows between them;
+  \item provide a safe workflow for preparing, running, and validating a code experiment on a workstation or HPC system.
+\end{itemize}
+
+\note{The published article documents the scientific prescriptions and the simulation-tree workflow, but it does not define a universal command-line interface, Makefile target, parameter-file syntax, or output-file schema. The operational instructions below distinguish general steps from repository-specific commands. Replace placeholders with the exact names used by the local checkout before submitting a production run.}
+
+\subsection{Terminology}
+\begin{description}[style=nextline,leftmargin=4.0cm]
+  \item[DM halo] A gravitationally bound dark-matter structure identified in an $N$-body simulation.
+  \item[Merger tree] A time-ordered record of halo progenitors and descendants, including merger events.
+  \item[SAM] Semi-analytic model. A set of coupled prescriptions that evolves baryonic components on top of halo merger trees.
+  \item[MBH] Massive black hole. The paper uses MBH for the individual objects and MBHB for binaries.
+  \item[Seed] The initial black hole formed in a newly resolved halo according to a seeding prescription.
+  \item[Wandering MBH] An MBH displaced from the nucleus but still orbiting within a galaxy or its dark-matter halo.
+  \item[Grafting] A procedure that extends merger trees from a large, lower-resolution simulation using information from a smaller, higher-resolution simulation.
+\end{description}
+
+% -----------------------------------------------------------------------------
+
+\newpage
+
+\section{Quick-start workflow for the code}
+
+\subsection{What must be available before a run}
+
+A valid run requires more than the source code. Confirm that the following items are available and mutually consistent:
+\begin{enumerate}
+  \item The intended \Lgalbh{} source-code version or branch, including its local documentation and configuration files.
+  \item A compiler and any libraries required by that version. The exact compiler, flags, and dependencies are repository-specific.
+  \item Halo merger trees and associated metadata for the selected simulation, in the format expected by the code.
+  \item The model parameter file(s), including the selected black-hole seeding and accretion prescriptions.
+  \item A writable output directory with sufficient quota and space, plus a separate directory for logs and job scripts.
+  \item The correct snapshot/redshift selection and cosmological metadata for the input trees.
+\end{enumerate}
+
+\subsection{Inspect the checkout before compiling}
+
+Do not start by guessing executable names or parameter keys. First inspect the local repository and its documentation:
+\begin{lstlisting}
+# Move to the actual directory containing the checkout
+cd /path/to/L-GalaxiesBH
+
+# Inspect the top-level structure and documentation
+pwd
+ls -lah
+find . -maxdepth 2 -type f | sort | head -200
+
+# Look for build instructions and example parameter files
+find . -maxdepth 3 -type f \\
+  \( -iname 'README*' -o -iname 'Makefile' -o -iname '*.cfg' \\
+     -o -iname '*.ini' -o -iname '*.param' -o -iname '*.sh' \) -print
+\end{lstlisting}
+
+Read the README and any run instructions first. If a Makefile is present, inspect its targets before invoking it. If the project uses a configuration file, copy the documented example to a new run-specific file rather than editing the only reference copy.
+
+\subsection{Build and launch}
+
+The commands below are schematic examples, not guaranteed commands for every \Lgalbh{} version. Use the build target and launch interface documented by the repository.
+
+\begin{lstlisting}
+# Example only: run this if the repository documents a Makefile build
+make <documented-target>
+
+# Example only: replace this with the documented executable and arguments
+./<executable> <parameter-file>
+\end{lstlisting}
+
+Before a production run, perform a short test with a small subset of the input trees or a reduced test configuration, if the code supports this. Confirm that the process exits normally, produces non-empty outputs, and writes useful diagnostic information to the log. Then repeat with the full sample.
+
+\subsection{Suggested run-directory layout}
+
+Keeping source code, input data, configuration, logs, and output products separate makes runs easier to reproduce and compare. A possible layout is:
+\begin{lstlisting}
+project/
+  source/                 # source checkout; do not edit during a run
+  inputs/                 # merger trees and metadata (often shared/read-only)
+  configs/                # one parameter file per model variation
+  jobs/                   # scheduler scripts
+  logs/                   # stdout, stderr, and diagnostic logs
+  outputs/
+    SuperEdd/
+    EddLim/
+    EddLim-HeavyMax/
+    EddLim-HeavyMin/
+  analysis/               # scripts for validation and derived statistics
+\end{lstlisting}
+
+This is a recommended organisation, not a directory structure imposed by the code.
+
+\subsection{HPC/SLURM job template}
+
+Use the cluster's own scheduler documentation and module system. The following is a template only; resource requests and the launch command must be adapted to the site and the executable's actual interface.
+
+\begin{lstlisting}
+#!/bin/bash
+#SBATCH --job-name=lg_bh_test
+#SBATCH --output=logs/lg_bh_%j.out
+#SBATCH --error=logs/lg_bh_%j.err
+#SBATCH --time=02:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+
+set -euo pipefail
+
+# Replace these with the modules required by the local build
+module purge
+# module load <compiler-or-library-module>
+
+cd /path/to/L-GalaxiesBH
+mkdir -p /path/to/project/logs /path/to/project/outputs/test
+
+# Replace with the exact documented launch command
+<documented-launch-command> \\
+  <parameter-file> \\
+  # Add output/config arguments only if the code supports them
+\end{lstlisting}
+
+\textbf{Important:} do not request MPI tasks or OpenMP threads unless the selected build actually uses them. Match the scheduler request to the code's parallelisation strategy. A serial executable launched with many tasks may waste the allocation rather than accelerate the run.
+
+\subsection{Run checklist}
+
+Before submission:
+\begin{itemize}
+  \item Record the source version or Git commit, compiler, build flags, and loaded modules.
+  \item Record the exact input-tree paths, simulation name, snapshot range, cosmology, and parameter-file path.
+  \item Use a unique output directory for each model variation; avoid overwriting previous runs.
+  \item Record random seeds if the code exposes them. If not, record that stochastic reproducibility may be limited.
+  \item Check input-file permissions, output quota, wall-time limit, and expected memory use.
+\end{itemize}
+
+After submission:
+\begin{itemize}
+  \item Confirm that the scheduler reports a normal exit status and that the log contains no fatal errors or repeated warnings.
+  \item Verify that the expected number of snapshots/trees was processed and that output files are not empty or truncated.
+  \item Check basic quantities before running expensive analysis: number of galaxies, number of MBHs, redshift coverage, mass ranges, and event counts.
+  \item Preserve the parameter file and logs next to the outputs, or in a run manifest that links them unambiguously.
+\end{itemize}
+
+% -----------------------------------------------------------------------------
+\section{Model architecture and simulation inputs}
+
+\subsection{From dark-matter merger trees to galaxies}
+
+The input to \Lgalbh{} is a set of halo merger trees. At each time step, the model evolves baryonic reservoirs and galaxy properties, then applies the MBH prescriptions to the galaxies and their merger histories. The model follows the galaxy-formation framework of \citet{Henriques2015}, while the MBH modules include seeding, gas accretion, spin evolution, binary dynamics, gravitational recoil, and wandering objects \citep{Bonoli2025}.
+
+A simplified data flow is:
+\begin{enumerate}
+  \item Read halo properties and progenitor/descendant links from the merger trees.
+  \item Initialise or update the galaxy's baryonic reservoirs and structural properties.
+  \item Apply cooling, star formation, stellar feedback, enrichment, and environmental processes.
+  \item Form MBH seeds when the selected prescription's conditions are met.
+  \item Evolve MBH masses, gas reservoirs, spins, binary states, and wandering orbits.
+  \item Write the galaxy and MBH properties at the output epochs requested by the run configuration.
+\end{enumerate}
+
+The exact order of subroutines, data structures, and output variables must be checked in the source code for the branch being used.
+
+\subsection{Millennium and Millennium-II}
+
+Bonoli et al. (2025) use the Millennium simulation (MS) and Millennium-II (MSII). Both contain $2160^3$ dark-matter particles, but their box sizes and mass resolutions differ:
+
+\begin{center}
+\begin{tabularx}{0.95\linewidth}{lXX}
+\toprule
+ & Millennium (MS) & Millennium-II (MSII) \\
+\midrule
+Box size & $500\,h^{-1}\,\mathrm{Mpc}$ & $100\,h^{-1}\,\mathrm{Mpc}$ \\
+Particle mass & $8.6\times10^8\,h^{-1}\Msun$ & $6.885\times10^6\,h^{-1}\Msun$ \\
+Minimum halo mass used in the paper (20 particles) & $1.85\times10^{10}\,h^{-1}\Msun$ & $1.53\times10^8\,h^{-1}\Msun$ \\
+Primary strength & Large volume and rare massive systems & Higher mass resolution and low-mass progenitors \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The trees were built from halo catalogues identified using friends-of-friends and SUBFIND, and arranged with L-HALOTREE. The original Millennium simulations were rescaled to a Planck first-year cosmology using the procedure of \citet{AnguloWhite2010}. The paper notes that snapshots are separated by approximately $300$ Myr and that \Lgal{} internally interpolates time steps of roughly $5$--$50$ Myr, depending on redshift \citep{Bonoli2025}.
+
+\subsection{Why grafting is used}
+
+A single simulation cannot simultaneously provide the large volume needed for rare, massive MBHs and the high mass resolution needed to follow early, low-mass progenitors. The grafting procedure in \citet{Bonoli2025} combines the strengths of MS and MSII:
+\begin{enumerate}
+  \item In bins of target-halo mass and redshift, measure from the high-resolution input simulation the average number of mergers with satellite masses unresolved in the target simulation.
+  \item Add the missing progenitors (called ``leaves'') to the target merger trees. Their number is sampled from a Poisson distribution with the measured mean; their distances from the central halo are drawn from a Lorentz distribution whose mean is the virial radius.
+  \item Initialise the added leaves with evolved baryonic and MBH content. This content is sampled from a galaxy/MBH population produced by running \Lgalbh{} on the high-resolution trees, selecting objects of comparable mass and redshift.
+\end{enumerate}
+
+In the setup of Bonoli et al. (2025), the MS trees are extended using MSII information over the mass range from approximately $1.53\times10^8$ to $1.85\times10^{10}\,h^{-1}\Msun$, with a bin width $\Delta\log_{10}(m)=0.1$. Grafting improves the statistics of mergers and the representation of unresolved progenitors, but does not recover every possible low-mass main branch. Results at the low-mass end therefore still require resolution-aware interpretation.
+
+\subsection{Recommended choice of input}
+\begin{itemize}
+  \item Use a high-resolution tree set such as MSII when the science depends on seed formation, dwarf galaxies, or low-mass MBHs.
+  \item Use a large-volume tree set such as MS when rare, massive systems and population statistics at the high-mass end are central.
+  \item Use the grafted MS+MSII setup when reproducing the broad dynamic range and merger statistics of Bonoli et al. (2025), provided the corresponding input products and grafting implementation are available.
+\end{itemize}
+
+% -----------------------------------------------------------------------------
+\newpage
+
+\section{Galaxy-formation physics inherited from \Lgal}
+
+The following is a concise overview of the baryonic model inherited from the Henriques et al. (2015) implementation. It is a physical summary, not a guarantee that every parameter value is identical in every \Lgalbh{} branch.
+
+\subsection{Gas infall and reionisation}
+
+Baryons are accreted as dark-matter haloes assemble. Photoionisation suppresses the baryon fraction in low-mass haloes. A common filtering-mass form is
+\begin{equation}
+ f_{\rm b}(z,M_{200c})=f_{\rm b}^{\rm cos}
+ \left[1+\left(2^{\alpha/3}-1\right)
+ \left(\frac{M_{200c}}{M_F(z)}\right)^{-\alpha}\right]^{-3/\alpha}.
+\end{equation}
+Here $M_F(z)$ is the filtering mass and $\alpha$ controls the shape of the suppression. The exact implementation of $M_F(z)$ should be checked in the selected code version.
+
+\subsection{Cooling of hot gas}
+
+The hot gas atmosphere cools radiatively. In the Henriques et al. (2015) formulation, the local cooling time is approximated by
+\begin{equation}
+ t_{\rm cool}(r)=\frac{3\mu m_{\rm H}kT_{200c}}
+ {2\rho_{\rm hot}(r)\Lambda(T_{\rm hot},Z_{\rm hot})},
+\end{equation}
+with an isothermal density profile
+\begin{equation}
+ \rho_{\rm hot}(r)=\frac{M_{\rm hot}}{4\pi R_{200c}r^2}.
+\end{equation}
+The cooling radius is defined by $t_{\rm cool}(r_{\rm cool})=t_{\rm dyn,h}$. If $r_{\rm cool}<R_{200c}$, cooling proceeds in a cooling-flow regime; if $r_{\rm cool}\geq R_{200c}$, the model uses rapid infall. The cooling function $\Lambda(T,Z)$ carries the temperature and metallicity dependence.
+
+\subsection{Disc sizes and angular momentum}
+
+Gas that cools onto the galaxy forms a disc whose angular momentum changes through cooling, star formation, reheating, and mergers. For an exponential disc, the scale length is related to specific angular momentum and circular velocity approximately as
+\begin{equation}
+ R_{\rm gas}=\frac{J_{\rm gas}/M_{\rm gas}}{2V_{\max}},\qquad
+ R_{\star}=\frac{J_{\star}/M_{\star,\rm disc}}{2V_{\max}}.
+\end{equation}
+The corresponding surface-density profiles are exponential, e.g. $\Sigma_{\rm gas}(R)=\Sigma_{\rm gas,0}\exp(-R/R_{\rm gas})$.
+
+\subsection{Quiescent star formation}
+
+The star-formation rate in a disc is set by the cold gas above a critical threshold:
+\begin{equation}
+ \dot M_{\star}=\alpha_{\rm SF}
+ \frac{M_{\rm gas}-M_{\rm crit}}{t_{\rm dyn,disc}},
+ \qquad t_{\rm dyn,disc}=\frac{R_{\star}}{V_{\max}},
+\end{equation}
+where the rate is zero when the cold gas does not exceed the threshold. A typical threshold form is
+\begin{equation}
+ M_{\rm crit}=M_{\rm crit,0}
+ \left(\frac{V_{200c}}{200\,\mathrm{km\,s^{-1}}}\right)
+ \left(\frac{R_{\rm gas}}{10\,\mathrm{kpc}}\right).
+\end{equation}
+
+\subsection{Stellar feedback, gas ejection, and reincorporation}
+
+Supernovae and stellar winds reheat cold gas into the hot reservoir. A mass-loading prescription has the general form
+\begin{equation}
+ \Delta M_{\rm reheat}=\epsilon_{\rm disc}\,\Delta M_{\star},\qquad
+ \epsilon_{\rm disc}=\epsilon\left[0.5+
+ \left(\frac{V_{\max}}{V_{\rm reheat}}\right)^{-\beta_1}\right].
+\end{equation}
+The feedback energy available for gas ejection is coupled to the stellar mass formed and a velocity scale; any energy left after reheating may eject gas from the halo. Ejected gas is subsequently reincorporated on a halo-mass-dependent timescale, commonly written
+\begin{equation}
+ t_{\rm reinc}=\gamma\frac{10^{10}\Msun}{M_{200c}}.
+\end{equation}
+These prescriptions regulate the supply of cold gas and are especially important for the growth of low-mass galaxies.
+
+\subsection{Metal enrichment, morphology, and environment}
+
+The model follows metal production through an effective stellar yield, with newly produced metals mixed into the gas reservoirs. Galaxy morphology changes through disc instabilities and galaxy mergers; mergers can produce starbursts and transfer stars into bulges. Satellites may lose hot gas through tidal and ram-pressure stripping, and orphan satellites may be disrupted or merge after a dynamical-friction delay. These processes influence the gas available for star formation and MBH accretion, and they determine when a satellite MBH is delivered to the central galaxy.
+
+\subsection{Radio-mode AGN feedback}
+
+Low-level accretion from the hot atmosphere powers mechanical feedback. In the form used by the model family,
+\begin{equation}
+ \dot M_{\rm BH,hot}=k_{\rm AGN}
+ \left(\frac{M_{\rm hot}}{10^{11}\Msun}\right)
+ \left(\frac{M_{\rm BH}}{10^8\Msun}\right),
+\end{equation}
+with mechanical power $\dot E_{\rm radio}=\eta_{\rm rad}\dot M_{\rm BH,hot}c^2$. The feedback reduces the effective cooling rate, often represented as
+\begin{equation}
+ \dot M_{\rm cool,eff}=\max\left[\dot M_{\rm cool}-
+ \frac{2\dot E_{\rm radio}}{V_{200c}^2},0\right].
+\end{equation}
+This channel is important for suppressing cooling in massive systems. Its normalisation is calibration-dependent; see the parameter notes in Section~\ref{sec:parameters}.
+
+% -----------------------------------------------------------------------------
+\section{Massive-black-hole physics in \Lgalbh}
+
+\subsection{Seed formation channels}
+
+\Lgalbh{} includes four broad seed channels:
+\begin{itemize}
+  \item \textbf{Light seeds:} remnants of Population III stars.
+  \item \textbf{Intermediate-mass seeds:} remnants of runaway stellar mergers (RSM) in dense stellar clusters.
+  \item \textbf{Heavy direct-collapse seeds (DCBH):} formed in metal-poor proto-galaxies under suitable radiative conditions.
+  \item \textbf{Merger-induced direct-collapse seeds (miDCBH):} associated with galaxy-merger conditions.
+\end{itemize}
+
+The physically motivated prescription uses the local Lyman--Werner radiation field and intergalactic-medium metallicity to determine whether RSM/DCBH channels are possible. The light-seed prescription is subgrid because MSII does not resolve individual Population III stars. In the implementation described by Bonoli et al. (2025), a possible light-seed host is assigned an earlier unresolved Pop III formation time; a Larson-type IMF is sampled, and the most massive eligible star becomes the seed. The pair-instability interval is excluded in that prescription. Seed formation is stopped when the local IGM metallicity reaches $Z_{\rm IGM}=10^{-3}Z_{\odot}$.
+
+A phenomenological alternative allows the relative frequency of seed types to be controlled directly. The probabilities $P_L$, $P_I$, and $P_H$ determine the light, intermediate, and heavy fractions and satisfy
+\begin{equation}
+ P_L+P_I+P_H=1.
+\end{equation}
+A seed is placed in a newly resolved halo with a probability that depends on redshift and halo mass. The article gives a scaling of the form
+\begin{equation}
+ P_{\rm seed}=A_{\rm seed}(1+z)^{7/2}
+ \left(\frac{M_{\rm halo}}{7\times10^{10}\Msun}\right),
+\end{equation}
+where $A_{\rm seed}$ is a normalisation. The selected seed type's mass is sampled from a distribution controlled by $\langle M_{\rm seed}\rangle$ and $\sigma_{M_{\rm seed}}$. Check the source code before changing these variables, since names and units may differ between branches.
+
+In the analysis presented by Bonoli et al. (2025), seeds are assumed to form at galaxy centres and their initial spin magnitudes are drawn randomly in $[0,0.998]$. The model also contains off-centre seeding functionality, but that feature is not part of the paper's main analysis.
+
+\subsection{Gas accretion and the MBH reservoir}
+
+\paragraph{Hot-gas accretion.} Accretion from the hot atmosphere follows the radio-mode expression in the previous section. It is usually far below the Eddington limit and contributes little to the MBH mass directly, but it is important for AGN feedback.
+
+\paragraph{Cold-gas supply from mergers.} A galaxy merger brings cold gas towards the nucleus. The maximum mass made available to the MBH is
+\begin{equation}
+ \Delta M_{\rm BH,merger}^{\rm gas}=
+ f_{\rm BH}^{\rm merger}
+ \frac{(1+z_{\rm merger})^{\alpha}\,(m_{\rm sat}/m_{\rm cen})}
+ {1+(V_{\rm BH}/V_{200})^2}\,M_{\rm gas}^{\rm merger},
+ \label{eq:bhmerger}
+\end{equation}
+where $m_{\rm sat}/m_{\rm cen}\leq 1$ is the baryonic mass ratio, $M_{\rm gas}^{\rm merger}$ is the remnant's cold gas mass, and $V_{200}$ is the virial velocity of the central subhalo. The redshift dependence reflects the greater compactness of high-redshift galaxies in the adopted prescription.
+
+\paragraph{Cold-gas supply from disc instabilities.} Disc instabilities can also drive gas towards the nucleus:
+\begin{equation}
+ \Delta M_{\rm BH,DI}^{\rm gas}=
+ f_{\rm BH}^{\rm DI}
+ \frac{(1+z_{\rm DI})^{\alpha}}
+ {1+(V_{\rm BH}/V_{200})^2}\,\Delta M_{\star}^{\rm DI},
+\end{equation}
+where $\Delta M_{\star}^{\rm DI}$ is the stellar mass transferred from the disc to the bulge to restore stability. The adopted normalisation for disc instabilities is smaller than for mergers in the Bonoli et al. (2025) setup.
+
+The gas supplied by a merger or disc instability is added to a nuclear reservoir $M_{\rm res}$ rather than instantaneously accreted. The reservoir is depleted as the MBH grows. The mass-growth equation can be expressed as
+\begin{equation}
+ \frac{dM_{\rm BH}}{dt}=
+ f_{\rm Edd}(t)\,\frac{1-\eta(t)}{\epsilon(t)}
+ \frac{M_{\rm BH}}{\tau_{\rm Edd}},
+ \qquad \tau_{\rm Edd}\simeq0.45\,\mathrm{Gyr},
+\end{equation}
+where $f_{\rm Edd}=L_{\rm bol}/L_{\rm Edd}$, $\eta$ is the radiative efficiency linked to spin, and $\epsilon$ depends on the accretion-flow state. The code can therefore follow Eddington-limited, sub-Eddington, and—under the relevant prescription—super-Eddington phases.
+
+\subsection{Eddington-limited and super-Eddington growth}
+
+Bonoli et al. (2025) compare two main growth prescriptions:
+\begin{itemize}
+  \item \textbf{Eddington-limited:} $f_{\rm Edd}$ never exceeds unity. Each accretion episode begins with a high-accretion phase and subsequently declines as the reservoir is consumed.
+  \item \textbf{Super-Eddington:} in sufficiently favourable conditions, a phase with $f_{\rm Edd}>1$ is allowed before the model transitions to a lower-accretion phase. This is intended to represent rapid early growth while accounting phenomenologically for self-regulation by feedback.
+\end{itemize}
+
+In the paper's implementation, the local conditions are characterised by the reservoir-to-BH mass ratio $R=M_{\rm res}/M_{\rm BH}$ and the gas inflow rate $\dot M_{\rm inflow}=\Delta M_{\rm BH}^{\rm gas}/t_{\rm dyn}$. The stated thresholds are $R_{\rm th}=2\times10^3$ and $\dot M_{\rm inflow,th}=10\,\Msun\,\mathrm{yr}^{-1}$. The super-Eddington episode is limited by a maximum mass that depends on the reservoir and on MBH mass; it is not an indefinitely sustained growth mode.
+
+\subsection{Tidal disruption events}
+
+The model includes a module for tidal disruption events (TDEs), in which stars passing within the MBH tidal radius can be disrupted and some of the debris can be accreted. The event rate is estimated using tabulated results from nuclear-cluster calculations and depends on the nuclear star cluster, stellar content, and MBH mass. Bonoli et al. (2025) omit this channel from their main growth analysis because its contribution to MBH growth is negligible for the mass range they emphasise. Availability in a code branch should be checked before assuming the module is active.
+
+\subsection{Spin evolution}
+
+The spin magnitude $\chi$ evolves through both gas accretion and MBH coalescences:
+\begin{itemize}
+  \item During accretion, the disc can align or counter-align with the MBH spin through the Bardeen--Petterson process. Prograde accretion tends to spin the MBH up, while retrograde accretion can spin it down.
+  \item During MBH mergers, the remnant spin is estimated using a fitting prescription based on angular-momentum conservation, depending on the binary mass ratio and the component spins.
+  \item The radiative efficiency used in the accretion model depends on spin through the innermost stable circular orbit. In the paper, the spin magnitude is capped at the Thorne limit, $\chi\simeq0.998$.
+\end{itemize}
+
+The model distinguishes wet mergers, in which the gas reservoir is sufficient to promote spin alignment, from dry mergers, in which spin orientations are treated as random. The published implementation evolves spin magnitude, not the full three-dimensional spin direction, which is a limitation when predicting recoil velocities.
+
+\subsection{Binary formation and dynamical evolution}
+
+Unlike a model that merges MBHs immediately when their host galaxies merge, \Lgalbh{} explicitly follows the main stages of MBH-binary evolution:
+\begin{enumerate}
+  \item \textbf{Pairing:} after an unequal-mass galaxy merger, the secondary MBH is deposited away from the nucleus and sinks through dynamical friction.
+  \item \textbf{Hardening:} once a bound binary forms, its separation and eccentricity evolve through interactions with a circumbinary gas disc in gas-rich environments or with stars in gas-poor environments.
+  \item \textbf{Gravitational-wave inspiral and coalescence:} GW emission drives the final inspiral, following the relevant orbital-evolution equations.
+\end{enumerate}
+
+The code numerically integrates the binary evolution according to its environment. It also permits MBHs to grow during the dynamical-friction and hardening phases. During hard-binary accretion, the model assumes preferential accretion onto the secondary; the prescription used in the paper is
+\begin{equation}
+ \dot M_{\rm BH,1}=\dot M_{\rm BH,2}(0.1+0.9q),
+\end{equation}
+where $q\leq1$ is the binary mass ratio and the secondary is assumed to accrete at the Eddington limit. If a third MBH reaches the nucleus before the binary coalesces, a triple interaction is treated using tabulated outcomes.
+
+\subsection{Wandering MBHs and gravitational recoil}
+
+Wandering MBHs arise mainly through two channels:
+\begin{itemize}
+  \item \textbf{Galaxy disruption:} a satellite galaxy may be tidally disrupted before its MBH reaches the central nucleus. Its MBH is then tracked as an orbiting object in the halo.
+  \item \textbf{Gravitational recoil:} anisotropic GW emission at MBH coalescence imparts a kick to the remnant. If the kick exceeds the escape speed from the galaxy, the remnant is displaced into the halo.
+\end{itemize}
+
+The wandering orbit is followed using the gravitational acceleration and dynamical friction from the surrounding components. The code allows a wandering MBH to be reincorporated into the galaxy if it comes within the galaxy size and its speed is below the local escape velocity. In the setup described by Bonoli et al. (2025), a galaxy entering a larger halo cannot retain its wandering MBHs; these are instead associated with the more massive system.
+
+% -----------------------------------------------------------------------------
+\section{Model variations in Bonoli et al. (2025)}
+
+The paper compares four configurations. Their differences are scientific assumptions, not necessarily four separate executables:
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{5.1cm}>{\raggedright\arraybackslash}p{6.0cm}}
+\toprule
+\textbf{Model} & \textbf{Seeding prescription} & \textbf{Accretion prescription} \\
+\midrule
+\endhead
+\textbf{SuperEdd} & Physically motivated mixture of light, intermediate, and heavy seeds. & Allows Eddington-limited and super-Eddington phases when the reservoir and inflow conditions are met. \\
+\textbf{EddLim} & Same physically motivated seeding as SuperEdd. & Accretion is capped at the Eddington limit. \\
+\textbf{EddLim-HeavyMax} & Phenomenological prescription with only heavy seeds; the heavy-seed abundance is deliberately boosted. & Eddington-limited growth. \\
+\textbf{EddLim-HeavyMin} & Only heavy seeds, with a four-times lower normalisation than EddLim-HeavyMax in the paper's setup. & Eddington-limited growth. \\
+\bottomrule
+\end{longtable}
+
+All four configurations include spin evolution, binary dynamics, and wandering MBHs from recoil and galaxy disruption. The two heavy-seed cases are deliberately constructed to test an optimistic upper range of heavy-seed abundance; they should not be interpreted as uniquely preferred physical models.
+
+\subsection{How to compare the variants}
+
+For a controlled comparison, keep the input merger trees, cosmology, output epochs, and non-varied parameters fixed. Change only the configuration items that define the model variant. Then compare at least:
+\begin{itemize}
+  \item the seed formation rate and MBH occupation fraction;
+  \item the MBH mass function and galaxy--MBH scaling relations;
+  \item high-redshift active-MBH statistics and luminosity functions, where available;
+  \item the MBH binary merger rate, mass-ratio distribution, and predicted GW-background observables;
+  \item the abundance and properties of wandering MBHs.
+\end{itemize}
+
+The last quantities depend on more than seed mass alone: accretion history, spin evolution, binary hardening, merger delays, and recoil all contribute.
+
+% -----------------------------------------------------------------------------
+\section{Parameters and calibration notes}\label{sec:parameters}
+
+\subsection{Galaxy-formation parameters}
+
+The following values reproduce the Henriques et al. (2015) calibration summarised in the original working draft. They are reference values for that model version, not a promise that they are the active defaults in every \Lgalbh{} checkout.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{6.3cm}>{\raggedleft\arraybackslash}p{2.2cm}}
+\toprule
+\textbf{Process} & \textbf{Parameter} & \textbf{Role} & \textbf{Henriques et al. (2015) value} \\
+\midrule
+\endhead
+Star formation & $\alpha_{\rm SF}$ & Efficiency per disc dynamical time & $0.025$ \\
+Star formation & $M_{\rm crit,0}$ & Normalisation of the cold-gas threshold & $2.4\times10^9\Msun$ \\
+Starbursts & $\alpha_{\rm SF,burst}$ & Normalisation of merger-induced star formation & $0.60$ \\
+Starbursts & $\beta_{\rm SF,burst}$ & Mass-ratio dependence of the starburst & $1.9$ \\
+SN reheating & $\epsilon$ & Mass-loading normalisation & $2.6$ \\
+SN reheating & $V_{\rm reheat}$ & Velocity scale for reheating & $480\,\mathrm{km\,s^{-1}}$ \\
+SN reheating & $\beta_1$ & Velocity dependence of reheating & $0.72$ \\
+SN ejection & $\eta$ & Energy efficiency of gas ejection & $0.62$ \\
+SN ejection & $V_{\rm eject}$ & Velocity scale for ejection & $100\,\mathrm{km\,s^{-1}}$ \\
+SN ejection & $\beta_2$ & Velocity dependence of ejection & $0.80$ \\
+Reincorporation & $\gamma$ & Normalisation of the reincorporation time & $3.0\times10^{10}\,\mathrm{yr}$ \\
+BH quasar mode & $f_{\rm BH}$ & Cold-gas accretion efficiency in mergers & $0.041$ \\
+BH quasar mode & $V_{\rm BH}$ & Velocity scale in the merger accretion law & $750\,\mathrm{km\,s^{-1}}$ \\
+Radio-mode AGN & $k_{\rm AGN}$ & Hot-gas accretion normalisation & $5.3\times10^{-3}\,\Msun\,\mathrm{yr}^{-1}$ \\
+Environment & $M_{\rm rp}$ & Threshold host-halo mass for ram-pressure stripping & $1.2\times10^{14}\Msun$ \\
+Orphan mergers & $\alpha_{\rm friction}$ & Dynamical-friction timescale normalisation & $2.5$ \\
+Chemical enrichment & $y$ & Effective metal yield & $0.046$ \\
+\bottomrule
+\end{longtable}
+
+\subsection{Black-hole parameters and values used in the 2025 paper}
+
+The values below are those explicitly stated in the relevant prescriptions of Bonoli et al. (2025). A parameter can differ between the Henriques calibration, a later branch, and a specific paper configuration; the active parameter file is the authority for a run.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{6.2cm}>{\raggedleft\arraybackslash}p{4.4cm}}
+\toprule
+\textbf{Parameter} & \textbf{Physical role} & \textbf{Value stated in Bonoli et al. (2025)} \\
+\midrule
+\endhead
+$k_{\rm AGN}$ & Normalisation of hot-gas accretion and radio-mode feedback & $1.7\times10^{-5}\,\Msun\,\mathrm{yr}^{-1}$ \\
+$f_{\rm BH}^{\rm merger}$ & Cold gas driven to the MBH reservoir by galaxy mergers & $0.028$ \\
+$f_{\rm BH}^{\rm DI}$ & Cold gas driven to the reservoir by disc instabilities & $0.0015$ \\
+$V_{\rm BH}$ & Velocity scale suppressing nuclear gas supply in shallow potentials & $280\,\mathrm{km\,s^{-1}}$ \\
+$\alpha$ & Redshift dependence of merger/instability-driven gas supply & $5/2$ \\
+$R_{\rm th}$ & Reservoir-to-MBH mass-ratio threshold for super-Eddington conditions & $2\times10^3$ \\
+$\dot M_{\rm inflow,th}$ & Inflow threshold for super-Eddington conditions & $10\,\Msun\,\mathrm{yr}^{-1}$ \\
+$P_L,P_I,P_H$ & Relative light/intermediate/heavy seed probabilities in the phenomenological prescription & Sum to unity; model dependent \\
+$A_{\rm seed}$ & Normalisation of phenomenological seed occurrence & Model dependent \\
+$\langle M_{\rm seed}\rangle,\sigma_{M_{\rm seed}}$ & Seed-mass distribution parameters & Model dependent \\
+\bottomrule
+\end{longtable}
+
+\note{The different $k_{\rm AGN}$ values shown in the two tables are not a typographical correction: they refer to different model calibrations/configurations as reported in the supplied Henriques-based draft and in Bonoli et al. (2025). Do not combine values across the two tables blindly. For a reproducible run, record the actual values read by the executable and cite the corresponding calibration.}
+
+\subsection{Parameters that are fixed or configuration-dependent}
+
+Not every quantity appearing in an equation is a free parameter. Some are fixed physical constants, some are set by the cosmology or simulation, and others are choices of the model variant. Examples include the returned stellar mass fraction, the merger-ratio threshold, the seed-type probabilities, and whether super-Eddington accretion is enabled. Consult the parameter file and source-code documentation to determine whether each quantity is adjustable in the version being run.
+
+% -----------------------------------------------------------------------------
+\section{Outputs, validation, and troubleshooting}
+
+\subsection{What to inspect in the outputs}
+
+The paper does not define a single portable output schema, so variable names and file formats must be checked in the local code. For any run, identify where the code stores the following quantities, if they are available:
+\begin{itemize}
+  \item galaxy properties: halo mass, stellar mass, cold/hot gas mass, star-formation rate, morphology, metallicity, and redshift;
+  \item MBH properties: seed type, MBH mass, accretion rate or luminosity, spin, nuclear/wandering status, and host-galaxy identifier;
+  \item binary properties: component masses, mass ratio, separation, eccentricity, evolutionary phase, and coalescence time/redshift;
+  \item run metadata: tree/simulation identifier, snapshot, model configuration, random seed, and any flags describing missing or unresolved histories.
+\end{itemize}
+
+\subsection{Minimum validation tests}
+
+Before interpreting scientific results, perform these checks:
+\begin{enumerate}
+  \item \textbf{Input sanity:} verify the number of trees, snapshot/redshift range, halo-mass range, and cosmology.
+  \item \textbf{Basic galaxy statistics:} inspect stellar-mass functions, gas fractions, star-formation rates, and the number of galaxies per snapshot.
+  \item \textbf{Black-hole statistics:} inspect the seed formation history, occupation fraction, MBH mass function, and fraction of galaxies with a central MBH.
+  \item \textbf{Binary consistency:} ensure that binary components exist in the input population, masses are positive, mass ratios are within the expected range, and coalescence times follow the chosen evolution model.
+  \item \textbf{Resolution checks:} compare MS, MSII, or grafted results only over mass ranges where each simulation has adequate resolution and volume.
+  \item \textbf{Convergence/reproducibility:} repeat a small test with the same configuration and seed if stochastic elements are present; compare outputs and quantify expected stochastic variation.
+\end{enumerate}
+
+\subsection{Common problems}
+\begin{longtable}{>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}p{9.8cm}}
+\toprule
+\textbf{Symptom} & \textbf{Checks to perform} \\
+\midrule
+\endhead
+The executable is not found & Check the build output, working directory, executable permissions, and the documented build target. \\
+The run stops immediately & Read the first fatal error in the log; verify parameter-file syntax, input paths, permissions, and required modules/libraries. \\
+No output or tiny output files & Check whether the job exited before processing trees, whether the output path is writable, and whether output writing is enabled for the selected run mode. \\
+The job exceeds wall time & Test a smaller input subset, estimate scaling with tree count, inspect I/O bottlenecks, and request resources consistent with actual parallelism. \\
+Unexpectedly few low-mass MBHs & Check simulation mass resolution, seed prescription, seed-formation conditions, and whether the analysis imposes additional selection cuts. \\
+Differences between MS, MSII, and grafted results & Separate volume effects from resolution effects; check the grafting mass range and remember that grafting cannot recover every unresolved main branch. \\
+Model variants appear identical & Confirm that the intended parameter file is actually read, that outputs go to separate directories, and that the chosen switches alter the code path. \\
+\bottomrule
+\end{longtable}
+
+% -----------------------------------------------------------------------------
+\section{Interpretation and limitations}
+
+\begin{itemize}
+  \item \textbf{A galaxy merger is not an MBH coalescence.} The explicit binary model introduces dynamical-friction, hardening, and GW-inspiral phases. The delay between galaxy merger and MBH coalescence can materially affect predicted GW populations.
+  \item \textbf{Seed formation is uncertain.} The paper compares physically motivated and phenomenological prescriptions; the heavy-only cases are deliberately optimistic tests rather than uniquely established scenarios.
+  \item \textbf{Super-Eddington growth is conditional.} It is allowed only in the relevant model variant and when the prescription's reservoir/inflow conditions are met.
+  \item \textbf{Spin directions are simplified.} The paper's implementation tracks spin magnitude rather than the full spin vector, limiting the information available for recoil predictions.
+  \item \textbf{Resolution and volume are complementary.} MS, MSII, and grafted catalogues have different selection limits. Agreement in one mass range does not imply identical completeness everywhere.
+  \item \textbf{Calibration matters.} Parameters reported for Henriques et al. (2015) should not automatically be treated as the defaults of the later \Lgalbh{} configuration.
+\end{itemize}
+
+% -----------------------------------------------------------------------------
+\section{References}
+
+\begin{thebibliography}{99}
+
+\bibitem[Angulo \& White(2010)]{AnguloWhite2010}
+Angulo, R.~E. \& White, S.~D.~M. 2010,
+\textit{One simulation to fit them all -- changing the background parameters of a cosmological N-body simulation},
+MNRAS, 405, 143.
+
+\bibitem[Barausse(2012)]{Barausse2012}
+Barausse, E. 2012,
+\textit{The evolution of massive black holes and their spins in their galactic hosts},
+MNRAS, 423, 2533.
+
+\bibitem[Boneti et al.(2018)]{Bonetti2018}
+Bonetti, M., Haardt, F., Sesana, A., \& Barausse, E. 2018,
+MNRAS, 477, 3910.
+
+\bibitem[Bonoli et al.(2025)]{Bonoli2025}
+Bonoli, S., Izquierdo-Villalba, D., Spinoso, D., et al. 2025,
+\textit{Constraints on the early growth of massive black holes from PTA and JWST with L-GalaxiesBH},
+arXiv:2509.12325.
+
+\bibitem[Henriques et al.(2015)]{Henriques2015}
+Henriques, B.~M.~B., White, S.~D.~M., Thomas, P.~A., et al. 2015,
+\textit{Galaxy formation in the Planck cosmology -- I. Matching the observed evolution of star formation rates, colours and stellar masses},
+MNRAS, 451, 2663.
+
+\bibitem[Izquierdo-Villalba et al.(2022)]{Izquierdo2022}
+Izquierdo-Villalba, D., Sesana, A., Bonoli, S., \& Colpi, M. 2022,
+\textit{Massive black hole evolution models confronting the n-Hz amplitude of the stochastic gravitational wave background},
+MNRAS, 509, 3488.
+
+\bibitem[Lousto et al.(2012)]{Lousto2012}
+Lousto, C.~O., Zlochower, Y., Dotti, M., \& Volonteri, M. 2012,
+Phys. Rev. D, 85, 084015.
+
+\bibitem[Peters \& Mathews(1963)]{PetersMathews1963}
+Peters, P.~C. \& Mathews, J. 1963, Phys. Rev., 131, 435.
+
+\end{thebibliography}
+
+\end{document}

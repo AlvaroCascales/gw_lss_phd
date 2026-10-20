@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large/data files
+*.hdf5
+*.h5
+*.npy
+*.npz
+*.fits
+*.csv
+*.dat
+
+# Outputs / temporary
+outputs/
+results/
+tmp/
+logs/
+# Compilacion y binarios
+build/
+*.o
+*.a
+*.so
+L-Gadget3
+
+# Archivos pesados y outputs de simulaciones
+*.hdf5
+*.out
+*.err
+treedata/
+trees_output/
+*.dat
