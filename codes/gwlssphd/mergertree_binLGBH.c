@@ -68,7 +68,7 @@ struct tree_data
   float VelDisp;
   float Vmax;
   float Spin[3];
-  // MODIFICACIÓN PARA L-GalaxiesBH: Variable CM eliminada 
+  // MODIFICACIÓN PARA L-GalaxiesBH: Variable CM eliminada
   // float CM[3];
 #endif
 
@@ -174,9 +174,9 @@ void modify_tree(int tree);
 
 
 
-/* 
- * build_mergertree: Initializes spatial hash table grid parameters or 
- * single-iteration configurations, sets the ghost region thickness, 
+/*
+ * build_mergertree: Initializes spatial hash table grid parameters or
+ * single-iteration configurations, sets the ghost region thickness,
  * and sequentially drives the execution of the merger tree building
  * routine across all defined iterations.
  */
@@ -202,11 +202,11 @@ void build_mergertree(int finalsnap)
 }
 
 
-/* 
- * build_mergertree_single: Executes a single iteration of the merger 
+/*
+ * build_mergertree_single: Executes a single iteration of the merger
  * tree building pipeline, loading catalogues across snapshots,
- * performing domain decompositions and ghost halo exchanges, linking 
- * descendant, progenitor, and FOF structures, optional main branch 
+ * performing domain decompositions and ghost halo exchanges, linking
+ * descendant, progenitor, and FOF structures, optional main branch
  * corrections, and saving the final trees.
  */
 
@@ -376,10 +376,10 @@ int build_mergertree_single(int finalsnap, int iter)
 }
 
 
-/* 
- * set_desc_grnr: Sorts local subhalos, establishes temporary 
- * descendant pointers via binary search, and assigns the 
- * Friends-of-Friends group number of the descendant (Desc_GrNr) back 
+/*
+ * set_desc_grnr: Sorts local subhalos, establishes temporary
+ * descendant pointers via binary search, and assigns the
+ * Friends-of-Friends group number of the descendant (Desc_GrNr) back
  * to each subhalo for subsequent tree operations.
  */
 
@@ -402,8 +402,8 @@ void set_desc_grnr()
 
 #ifdef SELECT_MAIN_BRANCHES
 
-/* 
- * process_tree: Initializes auxiliary tracking structures and resets * mass accumulation flags across all nodes in the given merger tree 
+/*
+ * process_tree: Initializes auxiliary tracking structures and resets * mass accumulation flags across all nodes in the given merger tree
  * before initiating recursive branch processing.
  */
 void process_tree(int tree)
@@ -422,9 +422,9 @@ void process_tree(int tree)
 }
 
 
-/* 
- * walk: Recursively traverses progenitor branches to compute and 
- * accumulate the integrated historical mass (MassInStem) for each 
+/*
+ * walk: Recursively traverses progenitor branches to compute and
+ * accumulate the integrated historical mass (MassInStem) for each
  * halo within the tree.
  */
 void walk(int nr)
@@ -464,16 +464,16 @@ void walk(int nr)
 }
 
 
-/* 
- * modify_tree: Corrects main progenitor branches and FOF group 
- * structures based on integrated mass history (MassInStem). 
- * 1. Progenitor Loop: Re-evaluates mergers to ensure the main branch 
- * follows the historically most massive lineage, preventing 
- * unphysical lineage jumps caused by transient snapshot mass 
+/*
+ * modify_tree: Corrects main progenitor branches and FOF group
+ * structures based on integrated mass history (MassInStem).
+ * 1. Progenitor Loop: Re-evaluates mergers to ensure the main branch
+ * follows the historically most massive lineage, preventing
+ * unphysical lineage jumps caused by transient snapshot mass
  * fluctuations.
- * 2. FOF Group Loop: Ensures that the central subhalo of each 
- * Friends-of-Friends group is the historically dominant one, 
- * reassigning global halo properties and substructure pointers 
+ * 2. FOF Group Loop: Ensures that the central subhalo of each
+ * Friends-of-Friends group is the historically dominant one,
+ * reassigning global halo properties and substructure pointers
  * accordingly for semi-analytic models.
  */
 
@@ -580,9 +580,9 @@ void modify_tree(int tree)
 #endif
 
 
-/* 
- * comp_halo_order_grnr: Comparison function used for sorting subhalos 
- * hierarchically by snapshot number, file number, FOF group number, 
+/*
+ * comp_halo_order_grnr: Comparison function used for sorting subhalos
+ * hierarchically by snapshot number, file number, FOF group number,
  * and subhalo index.
  */
 
@@ -615,8 +615,8 @@ int comp_halo_order_grnr(const void *a, const void *b)
   return 0;
 }
 
-/* 
- * comp_halo_order: Comparison function used for sorting subhalos 
+/*
+ * comp_halo_order: Comparison function used for sorting subhalos
  * hierarchically by snapshot number, file number, and subhalo index.
  */
 
@@ -644,10 +644,10 @@ int comp_halo_order(const void *a, const void *b)
 }
 
 
-/* 
- * tree_load_subhalo_catalogue: Loads Friends-of-Friends (FOF) group 
- * and SUBFIND subhalo catalogues from disk for a given snapshot, maps 
- * their properties and descendant pointers into dynamic memory, and 
+/*
+ * tree_load_subhalo_catalogue: Loads Friends-of-Friends (FOF) group
+ * and SUBFIND subhalo catalogues from disk for a given snapshot, maps
+ * their properties and descendant pointers into dynamic memory, and
  * prepares the structures required for merger tree construction.
  */
 
@@ -728,7 +728,7 @@ void tree_load_subhalo_catalogue(int num, int lastsnap)       /*ok */
     }
 #endif
   LocNsubgroups = LocNsubgroups + Nsubgroups;
- 
+
   if (num != lastsnap)
     myfree_movable(CatA);
   free_loaded_groups(load_id_list);
@@ -846,10 +846,10 @@ void tree_load_subhalo_catalogue(int num, int lastsnap)       /*ok */
 }
 
 
-/* 
- * mark_hash_cells: Evaluates spatial hash cells across the simulation 
- * box to determine which grid regions intersect with the local domain 
- * and its ghost zones, mapping and broadcasting the required physical 
+/*
+ * mark_hash_cells: Evaluates spatial hash cells across the simulation
+ * box to determine which grid regions intersect with the local domain
+ * and its ghost zones, mapping and broadcasting the required physical
  * files from disk to optimize I/O and data loading.
  */
 
@@ -994,10 +994,10 @@ int get_target_task(int iter, float *pos, int type, char typePart)
 }
 
 
-/* 
- * tree_domain_decompose: Redistributes subhalos across MPI tasks 
- * based on spatial domain criteria, handling parallel communication 
- * (Alltoall and Sendrecv) to migrate halos to their corresponding 
+/*
+ * tree_domain_decompose: Redistributes subhalos across MPI tasks
+ * based on spatial domain criteria, handling parallel communication
+ * (Alltoall and Sendrecv) to migrate halos to their corresponding
  * target processors.
  */
 
@@ -1080,9 +1080,9 @@ void tree_domain_decompose(int iter, int type)
 }
 
 
-/* 
- * periodic_wrap: Wraps coordinates or distances into the central 
- * periodic box domain [-0.5*BoxSize, 0.5*BoxSize] to account for 
+/*
+ * periodic_wrap: Wraps coordinates or distances into the central
+ * periodic box domain [-0.5*BoxSize, 0.5*BoxSize] to account for
  * periodic boundary conditions in cosmological simulations.
  */
 
@@ -1097,10 +1097,10 @@ double periodic_wrap(double x)
 }
 
 
-/* 
- * get_ghost_halos: Computes local domain centers and radii, shares 
- * them globally across MPI tasks via Allgather, and exchanges 
- * boundary subhalos (ghost halos) with neighboring domains to ensure 
+/*
+ * get_ghost_halos: Computes local domain centers and radii, shares
+ * them globally across MPI tasks via Allgather, and exchanges
+ * boundary subhalos (ghost halos) with neighboring domains to ensure
  * seamless cross-boundary tree construction.
  */
 
@@ -1146,7 +1146,7 @@ void get_ghost_halos(void)
     DomainRadius = -1;
 
   //if(ThisTask == 0 || ThisTask == NTask - 1)
-    printf("ThisTask=%d len=%f rad=%f DomainCenter=(%f,%f,%f) (%f-%f) (%f-%f) (%f-%f)\n", ThisTask, len, domainRadius,  domainCenter[0], domainCenter[1], domainCenter[2], 
+    printf("ThisTask=%d len=%f rad=%f DomainCenter=(%f,%f,%f) (%f-%f) (%f-%f) (%f-%f)\n", ThisTask, len, domainRadius,  domainCenter[0], domainCenter[1], domainCenter[2],
             xmin[0], xmax[0], xmin[1], xmax[1], xmin[2], xmax[2]);
 
 
@@ -1215,10 +1215,10 @@ void get_ghost_halos(void)
 }
 
 
-/* 
- * walk_it: Recursively traverses and extracts connected halos 
- * (following descendants, progenitors, and FOF group links) into a 
- * sequential, dynamically resized flat array (HaloList) to build an 
+/*
+ * walk_it: Recursively traverses and extracts connected halos
+ * (following descendants, progenitors, and FOF group links) into a
+ * sequential, dynamically resized flat array (HaloList) to build an
  * independent merger tree.
  */
 
@@ -1270,11 +1270,11 @@ void walk_it(int i)
 }
 
 
-/* 
- * check_tree_candidate: Validates whether the extracted tree belongs 
- * to the local MPI task (contains native z=0 halos and wins the 
- * deterministic ID ownership check), reallocates global memory 
- * buffers if necessary, and ermanently stores the tree nodes into the 
+/*
+ * check_tree_candidate: Validates whether the extracted tree belongs
+ * to the local MPI task (contains native z=0 halos and wins the
+ * deterministic ID ownership check), reallocates global memory
+ * buffers if necessary, and ermanently stores the tree nodes into the
  * global TreeHalos and TreeLen arrays.
  */
 
@@ -1376,10 +1376,10 @@ int check_tree_candidate(int iter)
 }
 
 
-/* 
- * generate_trees: Coordinates the traversal and root-finding of 
- * merger trees starting from z=0 snapshots, invoking recursive tree 
- * extraction (walk_it), reindexing pointers to match local array 
+/*
+ * generate_trees: Coordinates the traversal and root-finding of
+ * merger trees starting from z=0 snapshots, invoking recursive tree
+ * extraction (walk_it), reindexing pointers to match local array
  * offsets, and validating tree candidates for local MPI ownership.
  */
 
@@ -1439,15 +1439,15 @@ void generate_trees(int iter)
 
   //MPI_Barrier(MPI_COMM_WORLD);
   //exit(9);
- 
+
 }
 
 
-/* 
- * save_trees: Manages parallel I/O and synchronized disk writing of 
- * the generated merger trees across MPI tasks, computing global 
- * statistics (total trees, total halos, and maximum tree length) and 
- * sequentially writing tree lengths and node structures into binary 
+/*
+ * save_trees: Manages parallel I/O and synchronized disk writing of
+ * the generated merger trees across MPI tasks, computing global
+ * statistics (total trees, total halos, and maximum tree length) and
+ * sequentially writing tree lengths and node structures into binary
  * output files.
  */
 
@@ -1475,13 +1475,13 @@ void save_trees(int iter)
 
 /*
   int itree = ntrees = count_tree = 0;
-  for (int i = 0; i < NTrees; i++) 
+  for (int i = 0; i < NTrees; i++)
   {
     int oldLen = TreeLen[i];
     int root = TreeHalos[itree].FirstHaloInFOFgroup + itree;
     if (ShouldWeLoadCell(TreeHalos[root].Pos[0], TreeHalos[root].Pos[1], TreeHalos[root].Pos[2], DomainFac))
     {
-       memcpy(&TreeHalos[count_tree],&TreeHalos[itree],TreeLen[i]*sizeof(struct tree_data)); 
+       memcpy(&TreeHalos[count_tree],&TreeHalos[itree],TreeLen[i]*sizeof(struct tree_data));
        TreeLen[ntrees] = TreeLen[i];
        ntrees++;
        count_tree += TreeLen[i];
@@ -1513,8 +1513,8 @@ void save_trees(int iter)
 
       printf("Longest tree has %d nodes\n", maxlen);
 
-      // MODIFICACIÓN PARA LGBH: Evitamos volcar variables no leídas en el header 
-      // my_fwrite(&Niter, 1, sizeof(int), fd); 
+      // MODIFICACIÓN PARA LGBH: Evitamos volcar variables no leídas en el header
+      // my_fwrite(&Niter, 1, sizeof(int), fd);
       // my_fwrite(&Ncells_per_iter, 1, sizeof(int), fd);
       my_fwrite(&glob_NTrees, 1, sizeof(int), fd);
       my_fwrite(&glob_NHalos, 1, sizeof(int), fd);
@@ -1561,11 +1561,11 @@ void save_trees(int iter)
 }
 
 
-/* 
- * set_descendant_pointers: Connects each subhalo to its descendant in 
- * the subsequent snapshot by performing an efficient binary search 
- * (bisection) over sorted local subhalo catalogues, verifying valid 
- * mappings, and computing global spatial separation statistics across 
+/*
+ * set_descendant_pointers: Connects each subhalo to its descendant in
+ * the subsequent snapshot by performing an efficient binary search
+ * (bisection) over sorted local subhalo catalogues, verifying valid
+ * mappings, and computing global spatial separation statistics across
  * MPI tasks.
  */
 
@@ -1622,8 +1622,8 @@ void set_descendant_pointers(void)
               else
                 dir = 0;
 
-              /*              
-                 printf("left=%d right=%d mid=%d dir=%d  (%d|%d|%d) (%d|%d|%d) \n", 
+              /*
+                 printf("left=%d right=%d mid=%d dir=%d  (%d|%d|%d) (%d|%d|%d) \n",
                  left, right, mid, dir,
                  snapnum, filenr, subindex,
                  Halo[mid].SnapNum, Halo[mid].FileNr, Halo[mid].SubIndex);
@@ -1667,12 +1667,12 @@ void set_descendant_pointers(void)
                     for(int j = 0; j < LocNsubgroups; j++)
                         if ((Halo[j].SnapNum == snapnum) && (Halo[j].FileNr == filenr))
                         {
-                            printf("i=%d snap=%d filenr=%d grnr=%lld subibdex=%d\n", j, Halo[j].SnapNum, Halo[j].FileNr, Halo[j].FoF_GrNr, Halo[j].SubIndex); 
+                            printf("i=%d snap=%d filenr=%d grnr=%lld subibdex=%d\n", j, Halo[j].SnapNum, Halo[j].FileNr, Halo[j].FoF_GrNr, Halo[j].SubIndex);
                             if(Halo[j].SubIndex == subindex)
                                 printf("found it!!\n");
                         }
-                     fflush(stdout);  
-                    
+                     fflush(stdout);
+
                       Terminate
                         ("[%d] strange: the descendant subhalo has not been found for a local subhalo (i=%d subindex=%d filenr=%d @ snap=%d lastsnap=%d, )!",
                          ThisTask, i, subindex, filenr, Halo[i].SnapNum, LastSnapShotNr);
@@ -1705,11 +1705,11 @@ void set_descendant_pointers(void)
 }
 
 
-/* 
- * set_progenitor_pointers: Establishes and links progenitor chains 
- * for subhalos pointing toward their common descendants, sorting them 
- * hierarchically by fusion weight (Desc_Weight) to correctly 
- * designate main (FirstProgenitor) and secondary (NextProgenitor) 
+/*
+ * set_progenitor_pointers: Establishes and links progenitor chains
+ * for subhalos pointing toward their common descendants, sorting them
+ * hierarchically by fusion weight (Desc_Weight) to correctly
+ * designate main (FirstProgenitor) and secondary (NextProgenitor)
  * branches.
  */
 
@@ -1748,10 +1748,10 @@ void set_progenitor_pointers(void)
 }
 
 
-/* 
- * set_fof_pointers: Establishes horizontal linked lists for subhalos 
- * belonging to the same Friends-of-Friends (FOF) group within a 
- * snapshot by linking neighboring elements and assigning group head 
+/*
+ * set_fof_pointers: Establishes horizontal linked lists for subhalos
+ * belonging to the same Friends-of-Friends (FOF) group within a
+ * snapshot by linking neighboring elements and assigning group head
  * references (FirstHaloInFOFgroup and NextHaloInFOFgroup).
  */
 
